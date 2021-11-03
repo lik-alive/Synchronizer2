@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>Resources\live_sync.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\close.png" />
+    <None Remove="Resources\file.ico" />
+    <None Remove="Resources\folder.ico" />
+    <None Remove="Resources\folder.png" />
+    <None Remove="Resources\info.ico" />
+    <None Remove="Resources\left.png" />
+    <None Remove="Resources\live_sync.ico" />
+    <None Remove="Resources\right.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MaterialDesignThemes" Version="4.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\close.png" />
+    <Resource Include="Resources\file.ico" />
+    <Resource Include="Resources\folder.ico" />
+    <Resource Include="Resources\folder.png" />
+    <Resource Include="Resources\info.ico" />
+    <Resource Include="Resources\left.png" />
+    <Resource Include="Resources\live_sync.ico" />
+    <Resource Include="Resources\right.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Libs\" />
+  </ItemGroup>
+
+</Project>

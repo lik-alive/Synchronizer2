@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="Synchronizer.Forms.SideControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Synchronizer.Forms"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <TabControl x:Name="tabs" Padding="0" BorderThickness="0">
+        <TabControl.ItemContainerStyle>
+            <Style TargetType="{x:Type TabItem}">
+                <Setter Property="Visibility" Value="Collapsed"/>
+            </Style>
+        </TabControl.ItemContainerStyle>
+
+        <TabItem Header="Drag-n-Drop">
+            <local:DropZone x:Name="dropZone"></local:DropZone>
+        </TabItem>
+        <TabItem Header="Loading">
+            <local:BuildZone x:Name="buildZone"></local:BuildZone>
+        </TabItem>
+        <TabItem Header="Tree" >
+            <local:TreeZone x:Name="treeZone" Tree="{Binding Children, ElementName=buildZone}"></local:TreeZone>
+        </TabItem>
+    </TabControl>
+</UserControl>
