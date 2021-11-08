@@ -19,10 +19,10 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" Padding="5,0" TextWrapping="Wrap" Text="{Binding LeftPath}" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" />
+                <TextBlock Grid.Column="0" Padding="5,0" TextAlignment="Center" TextWrapping="Wrap" Text="{Binding LeftPath}" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" />
                 <materialDesign:PackIcon Visibility="{Binding IsLeftToRight, Converter={StaticResource VisibleIfTrue}}" Grid.Column="1" Width="40" Height="40" Kind="ChevronDoubleRight" />
                 <materialDesign:PackIcon Visibility="{Binding IsLeftToRight, Converter={StaticResource VisibleIfFalse}}" Grid.Column="1" Width="40" Height="40" Kind="ChevronDoubleLeft" />
-                <TextBlock Grid.Column="2" Padding="5,0" TextWrapping="Wrap" Text="{Binding RightPath}" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" />
+                <TextBlock Grid.Column="2" Padding="5,0" TextAlignment="Center" TextWrapping="Wrap" Text="{Binding RightPath}" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" />
             </Grid>
         </StackPanel>
 

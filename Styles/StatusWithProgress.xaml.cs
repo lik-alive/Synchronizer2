@@ -38,15 +38,10 @@ namespace Synchronizer.Styles
             }
         }
 
-        public readonly static DependencyProperty ProgressProperty =
-            DependencyProperty.Register("Progress", typeof(Double), typeof(StatusWithProgress),
-            new FrameworkPropertyMetadata((Double)100, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-
-        public Double Progress
-        {
-            get { return (Double)GetValue(ProgressProperty); }
-            set { SetValue(ProgressProperty, value); }
-        }
+        /// <summary>
+        /// Прогресс выполнения
+        /// </summary>
+        public Double Progress { get; private set; }
 
         public StatusWithProgress()
         {
@@ -54,6 +49,15 @@ namespace Synchronizer.Styles
 
             InitializeComponent();
             DataContext = this;
+        }
+
+        /// <summary>
+        /// Задание текущего прогресса
+        /// </summary>
+        /// <param name="progress"></param>
+        public void SetProgress(Double value)
+        {
+            OnPropertyChanged("Progress", value);
         }
 
         /// <summary>
@@ -89,6 +93,16 @@ namespace Synchronizer.Styles
 
         private void OnPropertyChanged(String propertyName)
         {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        private void OnPropertyChanged(String propertyName, Object value)
+        {
+            PropertyInfo prop = GetType().GetProperty(propertyName);
+            if (null != prop && prop.CanWrite)
+            {
+                prop.SetValue(this, value, null);
+            }
+
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 

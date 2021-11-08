@@ -55,6 +55,7 @@ namespace Synchronizer.Processing
         {
             try
             {
+                File.SetAttributes(path, FileAttributes.Normal);
                 File.Delete(path);
             }
             catch (Exception ex)

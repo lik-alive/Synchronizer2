@@ -119,7 +119,7 @@ namespace Synchronizer.Processing
             FSFile file1 = item1 as FSFile;
             FSFile file2 = item2 as FSFile;
 
-            Boolean sameDate = file1.LastWriteTime == file2.LastWriteTime;
+            Boolean sameDate = Math.Abs((file1.LastWriteTime - file2.LastWriteTime).TotalSeconds) <= 5;
             Boolean sameSize = file1.Length == file2.Length;
 
             
@@ -129,15 +129,15 @@ namespace Synchronizer.Processing
             }
             else
             {
-                Boolean isNewer1 = file1.LastWriteTime > file2.LastWriteTime;
-                Boolean isOlder1 = file1.LastWriteTime < file2.LastWriteTime;
+                Boolean isNewer1 = (file1.LastWriteTime - file2.LastWriteTime).TotalSeconds > 5;
+                Boolean isOlder1 = (file2.LastWriteTime - file1.LastWriteTime).TotalSeconds > 5;
                 Boolean isBigger1 = file1.Length > file2.Length;
                 Boolean isSmaller1 = file1.Length < file2.Length;
 
                 file1.SetAllFlags(false, isNewer1, isOlder1, isBigger1, isSmaller1);
 
-                Boolean isNewer2 = file2.LastWriteTime > file1.LastWriteTime;
-                Boolean isOlder2 = file2.LastWriteTime < file1.LastWriteTime;
+                Boolean isNewer2 = (file2.LastWriteTime - file1.LastWriteTime).TotalSeconds > 5;
+                Boolean isOlder2 = (file1.LastWriteTime - file2.LastWriteTime).TotalSeconds > 5;
                 Boolean isBigger2 = file2.Length > file1.Length;
                 Boolean isSmaller2 = file2.Length < file1.Length;
 

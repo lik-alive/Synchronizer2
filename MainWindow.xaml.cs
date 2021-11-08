@@ -258,8 +258,8 @@ namespace Synchronizer
             while (task.IsRunning)
             {
                 // Do not show progress for fast tasks
-                if (progress && skipped > 5) OnPropertyChanged("Progress", task.Progress);
-                skipped++;
+                if (progress && skipped > 5) statusPanel.SetProgress(task.Progress);
+                else skipped++;
                 Thread.Sleep(100);
             }
 
@@ -271,7 +271,7 @@ namespace Synchronizer
             if (task.Status == AsyncBase.AsyncStatus.ABORTED) return false;
 
             // Finalize progress increment
-            if (progress) OnPropertyChanged("Progress", 100);
+            if (progress) statusPanel.SetProgress(100);
 
             // Show next step
             if (task is FSAnalyzer) OnPropertyChanged("ShowSync", true);

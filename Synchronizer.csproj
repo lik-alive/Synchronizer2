@@ -6,6 +6,7 @@
     <UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\live_sync.ico</ApplicationIcon>
+    <AssemblyName>Synchronizer</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,8 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Libs\WpfControls.dll" />
-    <EmbeddedResource Include="Libs\WpfStyles.dll" />
+    <Resource Include="Libs\WpfControls.dll" />
+    <Resource Include="Libs\WpfStyles.dll" />
   </ItemGroup>
 
   <ItemGroup>

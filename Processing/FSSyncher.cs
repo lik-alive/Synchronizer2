@@ -70,7 +70,7 @@ namespace Synchronizer.Processing
             {
                 if (forceStop) return -1;
 
-                if (item.IsChecked == true) count += RecursiveCalcCopySize(item);
+                if (item.IsChecked != false) count += RecursiveCalcCopySize(item);
             }
 
             return count;
@@ -117,6 +117,7 @@ namespace Synchronizer.Processing
                 // Copy file
                 else
                 {
+                    if (item.Twin != null) FSActions.TryDeleteFile(newPath);
                     TryCopyFileStreamed(item.FullName, newPath);
                 }
             }

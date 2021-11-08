@@ -48,7 +48,7 @@
         </Grid>
 
         <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#31C3FD">
-            <styles:StatusWithProgress x:Name="statusPanel" Progress="{Binding Progress, Mode=OneWay}" />
+            <styles:StatusWithProgress x:Name="statusPanel" />
         </Grid>
     </Grid>
 </Window>
