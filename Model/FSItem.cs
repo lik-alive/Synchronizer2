@@ -62,14 +62,22 @@ namespace Synchronizer.Model
         /// <summary>
         /// Дочерние объекты (папки + файлы)
         /// </summary>
-        public List<FSItem> Children { get; protected set; } = null;
+        public List<FSItem> Children { get; protected set; } = new List<FSItem>();
 
         /// <summary>
-        /// Удаление файла из структуры
+        /// Различающиеся дочерние объекты (папки + файлы)
         /// </summary>
-        public void Disembed()
+        public List<FSItem> UnequalChildren
         {
-            if (Parent != null) Parent.Children.Remove(this);
+            get
+            {
+                List<FSItem> res = new List<FSItem>();
+                foreach (FSItem item in Children)
+                {
+                    if (!item.IsEqual) res.Add(item);
+                }
+                return res;
+            }
         }
 
         #endregion
@@ -81,6 +89,32 @@ namespace Synchronizer.Model
         /// Двойник
         /// </summary>
         public FSItem Twin { get; protected set; } = null;
+
+        /// <summary>
+        /// Установка двойника
+        /// </summary>
+        /// <param name="twin"></param>
+        public static void SetTwins(FSItem item1, FSItem item2)
+        {
+            item1.Twin = item2;
+            item2.Twin = item1;
+        }
+
+        /// <summary>
+        /// Флаг идентичности объектов
+        /// </summary>
+        public Boolean IsEqual { get; private set; } = false;
+
+        /// <summary>
+        /// Установка флага идентичности
+        /// </summary>
+        /// <param name="item1"></param>
+        /// <param name="item2"></param>
+        public static void SetEquals(FSItem item1, FSItem item2)
+        {
+            item1.IsEqual = true;
+            item2.IsEqual = true;
+        }
 
         /// <summary>
         /// Флаг уникальности объекта
@@ -118,33 +152,20 @@ namespace Synchronizer.Model
         }
 
         /// <summary>
-        /// Установка двойника
+        /// Рекурсивная чистка всех флагов
         /// </summary>
-        /// <param name="twin"></param>
-        public static void SetTwins(FSItem item1, FSItem item2)
+        public void Clear()
         {
-            item1.Twin = item2;
-            item2.Twin = item1;
-        }
+            foreach (FSItem item in Children)
+            {
+                item.Clear();
+            }
 
-        /// <summary>
-        /// Проброс дочерних флагов вверх по дереву
-        /// </summary>
-        public void UpdateFlagsToRoot()
-        {
-            for (Int32 i = 0; i < 5; i++)
-                if (NestedFlags[i]) SetFlagToRoot(Parent, i);
-        }
-
-        /// <summary>
-        /// Обновление родительских флагов
-        /// </summary>
-        /// <param name="item"></param>
-        /// <param name="i"></param>
-        private void SetFlagToRoot(FSItem item, Int32 i)
-        {
-            item.NestedFlags[i] = true;
-            if (item.Parent != null) SetFlagToRoot(item.Parent, i);
+            isExpanded = false;
+            isChecked = false;
+            Twin = null;
+            IsEqual = false;
+            NestedFlags = new Boolean[5] { false, false, false, false, false };
         }
 
         #endregion
@@ -155,7 +176,7 @@ namespace Synchronizer.Model
         /// <summary>
         /// Флаг выбора объекта для синхронизации
         /// </summary>
-        private Boolean? isChecked = true;
+        private Boolean? isChecked = false;
 
         /// <summary>
         /// Статус выбора объекта для синхронизации
@@ -165,8 +186,10 @@ namespace Synchronizer.Model
             get { return isChecked; }
             set
             {
-                SetIsChecked(value);
-                if (Twin != null) Twin.SetIsChecked(value);
+                SetCheckedDown(value);
+                if (Twin != null) Twin.SetCheckedDown(value);
+
+                if (Parent != null) Parent.VerifyCheckState();
             }
         }
 
@@ -174,40 +197,62 @@ namespace Synchronizer.Model
         /// Установка статуса выбора объекта
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="updateChildren"></param>
-        /// <param name="updateParent"></param>
-        private void SetIsChecked(bool? value, bool updateChildren = true, bool updateParent = true)
+        private void SetChecked(Boolean? value)
         {
-            if (value == isChecked) return;
-
             isChecked = value;
-
-            if (updateChildren && IsDirectory)
-                Children.ForEach(c => c.SetIsChecked(value, true, false));
-
-            if (updateParent && Parent != null)
-                Parent.VerifyCheckState();
-
             OnPropertyChanged("IsChecked");
         }
 
         /// <summary>
-        /// Проверка корректности статуса
+        /// Установка статуса выбора объекта вниз по дереву
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="updateChildren"></param>
+        /// <param name="updateParent"></param>
+        private void SetCheckedDown(bool? value)
+        {
+            if (value == isChecked) return;
+
+            SetChecked(value);
+
+            if (IsDirectory) UnequalChildren.ForEach(c => c.SetCheckedDown(value));
+        }
+
+        /// <summary>
+        /// Проверка корректности статуса выбора
         /// </summary>
         private void VerifyCheckState()
         {
-            bool? state = null;
-            for (int i = 0; i < Children.Count; i++)
+            bool? value = CalcCheckState();
+            SetChecked(value);
+
+            if (Twin != null)
             {
-                bool? current = Children[i].IsChecked;
-                if (i == 0) state = current;
-                else if (state != current)
+                bool? twinValue = Twin.CalcCheckState();
+                Twin.SetChecked(twinValue);
+            }
+
+            if (Parent != null) Parent.VerifyCheckState();
+        }
+
+        /// <summary>
+        /// Вычисление статуса выбора по дочерним объектам
+        /// </summary>
+        private bool? CalcCheckState()
+        {
+            bool? value = false;
+            for (int i = 0; i < UnequalChildren.Count; i++)
+            {
+                bool? current = UnequalChildren[i].isChecked;
+                if (i == 0) value = current;
+                else if (value != current)
                 {
-                    state = null;
+                    value = null;
                     break;
                 }
             }
-            SetIsChecked(state, false, true);
+
+            return value;
         }
 
         #endregion
@@ -229,6 +274,114 @@ namespace Synchronizer.Model
         /// </summary>
         public Uri Icon { get; protected set; }
 
+        /// <summary>
+        /// Флаг раскрытия списка вложенных элементов
+        /// </summary>
+        private Boolean isExpanded = false;
+
+        /// <summary>
+        /// Раскрытие списка вложенных элементов
+        /// </summary>
+        public Boolean IsExpanded
+        {
+            get
+            {
+                return isExpanded;
+            }
+            set
+            {
+                SetIsExpanded(value); 
+                if (Twin != null) Twin.SetIsExpanded(value);
+            }
+        }
+
+        /// <summary>
+        /// Задание флага раскрытия списка вложенных элементов
+        /// </summary>
+        private void SetIsExpanded(Boolean value)
+        {
+            isExpanded = value;
+            OnPropertyChanged("IsExpanded");
+        }
+
+        /// <summary>
+        /// Задание флага раскрытия списка всех вложенных элементов
+        /// </summary>
+        /// <param name="value"></param>
+        public void SetIsExpandedAll(Boolean value, Boolean isAnalyzed)
+        {
+            if (!value) SetIsCollapsedAll();
+            else
+            {
+                Int32 quota = 1000;
+                Int32 level = 0;
+                while (quota > 0)
+                {
+                    Int32 newQuota = SetIsExpandedAllWave(level, quota, isAnalyzed);
+                    if (newQuota == quota) break;
+
+                    quota = newQuota;
+                    level++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Раскрытие элементов волнами (иначе вешает систему)
+        /// </summary>
+        /// <param name="value"></param>
+        private Int32 SetIsExpandedAllWave(Int32 level, Int32 quota, Boolean isAnalyzed)
+        {
+            if (level == 0)
+            {
+                SetIsExpanded(true);
+                if (isAnalyzed) quota -= UnequalChildren.Count;
+                else quota -= Children.Count;
+            }
+            else
+            {
+                foreach (FSItem item in Children)
+                {
+                    if (item.IsDirectory && quota > 0) quota = item.SetIsExpandedAllWave(level - 1, quota, isAnalyzed);
+                }
+            }
+            
+            return quota;
+        }
+
+        /// <summary>
+        /// Сокрытие всех элементов
+        /// </summary>
+        private void SetIsCollapsedAll()
+        {
+            SetIsExpanded(false);
+            foreach (FSItem item in Children)
+            {
+                if (item.IsDirectory) item.SetIsCollapsedAll();
+            }
+        }
+
+        /// <summary>
+        /// Флаг выбора объекта
+        /// </summary>
+        private Boolean isSelected = false;
+
+        /// <summary>
+        /// Выбор объекта
+        /// </summary>
+        public Boolean IsShadowSelected
+        {
+            get
+            {
+                return isSelected;
+            }
+            set
+            {
+                isSelected = value;
+                OnPropertyChanged("IsShadowSelected");
+            }
+        }
+
         #endregion
 
 
@@ -249,8 +402,7 @@ namespace Synchronizer.Model
 
         void OnPropertyChanged(string prop)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(prop));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

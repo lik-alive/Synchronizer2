@@ -52,7 +52,7 @@ namespace Synchronizer.Processing
                 }
 
 
-                if (Finished != null) Finished();
+                Finished?.Invoke();
             });
             monitorThread.Start();
         }

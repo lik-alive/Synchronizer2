@@ -10,73 +10,129 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
-                <Setter Property="IsExpanded" Value="False" />
+                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                <Setter Property="Background" Value="Transparent" />
+                <EventSetter Event="KeyDown" Handler="treeItem_KeyDown" />
+                <EventSetter Event="GotFocus" Handler="treeItem_GotFocus" />
+                <EventSetter Event="LostFocus" Handler="treeItem_LostFocus" />
+                <EventSetter Event="MouseRightButtonDown" Handler="treeItem_MouseRightButtonDown" />
             </Style>
 
-            <HierarchicalDataTemplate x:Key="CheckBoxItemTemplate" ItemsSource="{Binding Children, Mode=OneTime}" >
+            <HierarchicalDataTemplate x:Key="CheckBoxItemTemplate" ItemsSource="{Binding UnequalChildren, Mode=OneWay}">
                 <StackPanel Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding IsChecked}" VerticalAlignment="Center" IsTabStop="False" Visibility="{Binding IsReadyToSync, Converter={StaticResource BoolToVis}, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsFocused, RelativeSource={RelativeSource Mode=Self}}" Value="False" />
+                                        <Condition Binding="{Binding IsShadowSelected}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <MultiDataTrigger.Setters>
+                                        <Setter Property="Background" Value="#E1BEE7"/>
+                                    </MultiDataTrigger.Setters>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+
+                    <StackPanel.ContextMenu>
+                        <ContextMenu Focusable="False">
+                            <ContextMenu.Template>
+                                <ControlTemplate>
+                                    <Border x:Name="Border" BorderThickness="1" BorderBrush="#ccc" Background="#CCDDED">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                    </Border>
+
+                                    <ControlTemplate.Resources>
+                                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                                            <Setter Property="Background" Value="#A0DBF3" />
+                                            <Setter Property="Focusable" Value="False" />
+                                            <Style.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#31C3FD" />
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ControlTemplate.Resources>
+                                </ControlTemplate>
+                                
+                            </ContextMenu.Template>
+
+                            <MenuItem Header="Open in File Explorer" Click="explorer_Click">
+                                <MenuItem.Icon>
+                                    <materialDesign:PackIcon Kind="FolderSearch" />    
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </StackPanel.ContextMenu>
+                    
+                    <CheckBox Visibility="{Binding Tree.IsAnalyzed, Converter={StaticResource VisibleIfTrue}, RelativeSource={RelativeSource AncestorType=UserControl}}" IsChecked="{Binding IsChecked}" VerticalAlignment="Center" IsTabStop="False" Focusable="False">
+                        <CheckBox.Style>
+                            <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                                <Setter Property="Background" Value="#673AB7" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsFocused, RelativeSource={RelativeSource AncestorType=TreeViewItem}}" Value="True">
+                                        <Setter Property="Background" Value="White" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </CheckBox.Style>
+                    </CheckBox>
                     <Image Source="{Binding Icon}" Width="20" Height="20" Margin="2" />
-                    <TextBlock Text="{Binding Name, Mode=OneTime}" Margin="2,0" Padding="0"/>
-                    <TextBlock Visibility="{Binding NestedFlags[0], Converter={StaticResource BoolToVis}}" FontSize="10" VerticalAlignment="Center" Background="GreenYellow" Padding="2,0" Margin="1,0">#exclusive</TextBlock>
-                    <TextBlock Visibility="{Binding NestedFlags[1], Converter={StaticResource BoolToVis}}" FontSize="10" VerticalAlignment="Center" Background="Orange" Padding="2,0" Margin="1,0">#newer</TextBlock>
-                    <TextBlock Visibility="{Binding NestedFlags[2], Converter={StaticResource BoolToVis}}" FontSize="10" VerticalAlignment="Center" Background="DeepSkyBlue" Padding="2,0" Margin="1,0">#older</TextBlock>
-                    <TextBlock Visibility="{Binding NestedFlags[3], Converter={StaticResource BoolToVis}}" FontSize="10" VerticalAlignment="Center" Background="OrangeRed" Padding="2,0" Margin="1,0">#larger</TextBlock>
-                    <TextBlock Visibility="{Binding NestedFlags[4], Converter={StaticResource BoolToVis}}" FontSize="10" VerticalAlignment="Center" Background="CornflowerBlue" Padding="2,0" Margin="1,0">#smaller</TextBlock>
+                    <TextBlock Text="{Binding Name}" Margin="2,0" Padding="0"/>
+                    <StackPanel Visibility="{Binding Tree.IsAnalyzed, Converter={StaticResource VisibleIfTrue}, RelativeSource={RelativeSource AncestorType=UserControl}}" Orientation="Horizontal" Margin="5,0">
+                        <TextBlock Visibility="{Binding IsUnique, Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#2E7D32" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#unique</TextBlock>
+                        <!-- Directory flags -->
+                        <StackPanel Visibility="{Binding IsDirectory, Converter={StaticResource VisibleIfTrue}}" Orientation="Horizontal">
+                            <TextBlock Visibility="{Binding NestedFlags[0], Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#26A69A" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#hasUnique</TextBlock>
+                            <TextBlock Visibility="{Binding NestedFlags[1], Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#D84315" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#hasNewer</TextBlock>
+                            <TextBlock Visibility="{Binding NestedFlags[2], Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#455A64" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#hasOlder</TextBlock>
+                            <TextBlock Visibility="{Binding NestedFlags[3], Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#FF6F00" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#hasLarger</TextBlock>
+                            <TextBlock Visibility="{Binding NestedFlags[4], Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#4E342E" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#hasSmaller</TextBlock>
+                        </StackPanel>
+                        <!-- File flags -->
+                        <StackPanel Visibility="{Binding IsDirectory, Converter={StaticResource VisibleIfFalse}}" Orientation="Horizontal">
+                            <TextBlock Visibility="{Binding NestedFlags[1], Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#D84315" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#newer</TextBlock>
+                            <TextBlock Visibility="{Binding NestedFlags[2], Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#455A64" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#older</TextBlock>
+                            <TextBlock Visibility="{Binding NestedFlags[3], Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#FF6F00" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#larger</TextBlock>
+                            <TextBlock Visibility="{Binding NestedFlags[4], Converter={StaticResource VisibleIfTrue}}" FontSize="10" VerticalAlignment="Center" Background="#4E342E" Foreground="White" Width="60" TextAlignment="Center" Margin="1,0">#smaller</TextBlock>
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
             </HierarchicalDataTemplate>
-
-            <Style x:Key="IconButton" TargetType="Button">
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="BorderThickness" Value="0" />
-                <Setter Property="Cursor" Value="Hand" />
-                <Setter Property="Opacity" Value="0.6" />
-                <Setter Property="Width" Value="38"></Setter>
-                <Setter Property="Height" Value="38"></Setter>
-
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type Button}">
-                            <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-
-                <Style.Resources>
-                    <Style TargetType="materialDesign:PackIcon">
-                        <Setter Property="Width" Value="36"></Setter>
-                        <Setter Property="Height" Value="36"></Setter>
-                    </Style>
-                </Style.Resources>
-
-                <Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Opacity" Value="0.85" />
-                    </Trigger>
-
-                    <Trigger Property="IsPressed" Value="True">
-                        <Setter Property="Opacity" Value="1" />
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
 
     <Grid>
-        <TreeView
-            ItemContainerStyle="{StaticResource TreeViewItemStyle}" 
-            ItemTemplate="{StaticResource CheckBoxItemTemplate}" 
-            ItemsSource="{Binding Tree}"  
-            BorderThickness="0"  Padding="5,10"/>
+        <Grid Background="#f3f3f3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="36" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="#00A9EC" VerticalAlignment="Stretch">
+                <TextBlock Text="{Binding Tree.FullName}" FontSize="18" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" Margin="10,0,110,0" ToolTip="{Binding Tree.FullName}" />
+            </Border>
+            <TreeView x:Name="treeView" Grid.Row="1" VirtualizingStackPanel.IsVirtualizing="True"
+                ItemContainerStyle="{StaticResource TreeViewItemStyle}" 
+                ItemTemplate="{StaticResource CheckBoxItemTemplate}" 
+                ItemsSource="{Binding Path=Tree.UnequalChildren, IsAsync=True}"  
+                BorderThickness="0"  Margin="5,10" />
+        </Grid>
         <Canvas>
-            <StackPanel Canvas.Right="10" Canvas.Top="10" Orientation="Horizontal">
-                <Button Margin="5" Style="{StaticResource IconButton}" ToolTip="Refresh all files" Foreground="#00A9EC">
+            <StackPanel Canvas.Right="10" Canvas.Top="0" Orientation="Horizontal" IsEnabled="{Binding ShowActions}">
+                <Button Visibility="{Binding IsExpandAll, Converter={StaticResource VisibleIfFalse}}" Style="{StaticResource IconButton}" Margin="5,0" Foreground="White" ToolTip="Expand all" Click="expandAll_Click">
+                    <materialDesign:PackIcon Kind="ArrowExpandAll" />
+                </Button>
+                <Button Visibility="{Binding IsExpandAll, Converter={StaticResource VisibleIfTrue}}" Style="{StaticResource IconButton}" Margin="5,0" Foreground="White" ToolTip="Collapse all" Click="expandAll_Click">
+                    <materialDesign:PackIcon Kind="ArrowCollapseAll" />
+                </Button>
+                <Button Margin="5,0" Style="{StaticResource IconButton}" ToolTip="Refresh all files" Foreground="White" Click="refresh_Click">
                     <materialDesign:PackIcon Kind="Refresh" />
                 </Button>
-                <Button BorderThickness="0" Style="{StaticResource IconButton}" ToolTip="Close folder" Foreground="DarkRed">
-                    <materialDesign:PackIcon Height="30" Width="30" Kind="CloseCircle" />
+                <Button Margin="5,0" Style="{StaticResource IconButton}" ToolTip="Close folder" Foreground="White" Click="close_Click">
+                    <materialDesign:PackIcon Height="30" Width="30" Kind="Close" />
                 </Button>
             </StackPanel>
         </Canvas>

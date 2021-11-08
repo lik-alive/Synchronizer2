@@ -6,45 +6,49 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
         xmlns:forms="clr-namespace:Synchronizer.Forms"
+        xmlns:styles="clr-namespace:Synchronizer.Styles"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Style="{DynamicResource WindowStyle}"
         mc:Ignorable="d"
-        Title="Synchronizer" FontSize="16" BorderBrush="#00A9EC" WindowStyle="None" WindowStartupLocation="CenterScreen" MinWidth="850" MinHeight="400" d:DesignWidth="934" Icon="/Synchronizer;component/Resources/live_sync.ico" Background="#EFEFEF">
-    <!--Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Synchronizer;component/Forms/ButtonStyle.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources-->
+        Title="Synchronizer v2" FontSize="16" BorderBrush="#31C3FD" WindowStyle="None" WindowStartupLocation="CenterScreen" MinWidth="850" MinHeight="400" d:DesignWidth="934" Icon="/Synchronizer;component/Resources/live_sync.ico" Background="#EFEFEF">
+    <Window.Resources>
+        
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="40" />
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,10,0">
+        <Grid Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10,0,10,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="60" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <forms:SideControl x:Name="left" Grid.Column="0" Margin="10"></forms:SideControl>
-            <Canvas Grid.Column="1" Height="100">
-                <Canvas.Background>
-                    <ImageBrush ImageSource="/Synchronizer;component/Resources/right.png" Stretch="Uniform"/>
-                </Canvas.Background>
-            </Canvas>
-            <forms:SideControl x:Name="right" Grid.Column="2" Margin="10"></forms:SideControl>
+            <forms:Viewer x:Name="left" Grid.Column="0" Margin="10"></forms:Viewer>
+
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <Button Margin="5,0" Style="{StaticResource IconButton}" ToolTip="Analyze folders" Click="analyze_Click" Width="50" Height="50" Visibility="{Binding ShowAnalysis, Converter={StaticResource VisibleIfTrue}}">
+                    <materialDesign:PackIcon Kind="Compare" Width="50" Height="50" />
+                </Button>
+                <Button Margin="5,0" Style="{StaticResource IconButton}" ToolTip="Abort" Click="abort_Click" Width="50" Height="50" Visibility="{Binding ShowAbort, Converter={StaticResource VisibleIfTrue}}">
+                    <materialDesign:PackIcon Kind="Close" Width="50" Height="50" />
+                </Button>
+                <Button x:Name="toRight" Margin="5,0" Style="{StaticResource IconButton}" ToolTip="Synchronize left to right" Click="sync_Click" Width="50" Height="50" Visibility="{Binding ShowSync, Converter={StaticResource VisibleIfTrue}}">
+                    <materialDesign:PackIcon Kind="ChevronDoubleRight" Width="50" Height="50" />
+                </Button>
+                <Button x:Name="toLeft" Margin="5,25,5,0" Style="{StaticResource IconButton}" ToolTip="Synchronize right to left" Click="sync_Click" Width="50" Height="50" Visibility="{Binding ShowSync, Converter={StaticResource VisibleIfTrue}}">
+                    <materialDesign:PackIcon Kind="ChevronDoubleLeft" Width="50" Height="50" />
+                </Button>
+            </StackPanel>
+            
+            <forms:Viewer x:Name="right" Grid.Column="2" Margin="10"></forms:Viewer>
         </Grid>
 
-        <Grid Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#00A9EC">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="300" />
-            </Grid.ColumnDefinitions>
-            <ComboBox x:Name="statusComboBox" Grid.Column="0" Margin="10,0,0,0" Height="30" VerticalAlignment="Stretch"/>
-            <ProgressBar x:Name="progressBar" Grid.Column="1" Width="230" Margin="0,0,10,0" Height="25" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="Black"/>
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#31C3FD">
+            <styles:StatusWithProgress x:Name="statusPanel" Progress="{Binding Progress, Mode=OneWay}" />
         </Grid>
     </Grid>
 </Window>

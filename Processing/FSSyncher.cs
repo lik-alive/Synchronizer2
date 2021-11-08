@@ -1,162 +1,190 @@
-﻿using System;
+﻿using Synchronizer.Log;
+using Synchronizer.Model;
+using System;
 using System.IO;
 using System.Threading;
 
 namespace Synchronizer.Processing
 {
-    /*public class FSSyncher : AsyncBase
+    public class FSSyncher : AsyncBase
     {
-        private Boolean SAVE_MODE = true;
-
-        private String tempSaveFolder;
-
-        private CmpDirectory iroot1, iroot2;
-        
-        public FSSyncher(CmpDirectory iroot1, CmpDirectory iroot2, Boolean deleteDuplicates = false)
+        public FSSyncher(FSTree tree1, FSTree tree2, Boolean deleteUnique = false)
         {
-            this.iroot1 = iroot1;
-            this.iroot2 = iroot2;
-
             execThread = new Thread(() =>
             {
-                try
+                DateTime start = DateTime.Now;
+                Logger.RaiseLog("Synchronization started");
+
+                // Calc files count
+                long copySize = RecursiveCalcCopySize(tree1.Root);
+
+                if (deleteUnique)
                 {
-                    if (SAVE_MODE)
-                    {
-                        tempSaveFolder = Path.Combine(Path.GetTempPath(), "MySync\\ManualSaved");
-
-                        if (!Directory.Exists(tempSaveFolder))
-                            if (!FSActions.TryCreateDirectory(tempSaveFolder))
-                                return;
-
-                        tempSaveFolder = Path.Combine(tempSaveFolder, DateTime.Now.ToString("H_mm_ss yyyy_MM_dd"));
-                        while (Directory.Exists(tempSaveFolder))
-                            tempSaveFolder += " 1";
-
-                        if (!FSActions.TryCreateDirectory(tempSaveFolder)) return;
-                    }
-
-                    RecursiveCalcSizeCopy(iroot1);
-                    RecursiveSync(iroot1, iroot1.FullName, iroot2.FullName);
-
-                    if (deleteDuplicates)
-                    {
-                        RecursieveCalcSizeDelete(iroot2);
-                        RecursiveDelete(iroot2, iroot2.FullName);
-                    }
+                    Int32 deleteCount = RecursiveCalcDeleteCount(tree2.Root);
+                    syncProgressInc = 90.0 / copySize;
+                    deleteProgressInc = 10.0 / deleteCount;
                 }
-                catch (Exception ex)
+                else
                 {
-                    Logger.RaiseMessage("Error: " + ex.Message);
+                    syncProgressInc = 100.0 / copySize;
+                }
+
+                // Synchronize
+                fromRootPath = tree1.FullName;
+                toRootPath = tree2.FullName;
+                RecursiveSync(tree1.Root);
+
+                // Delete unique
+                if (deleteUnique) RecursiveDelete(tree2.Root);
+
+                if (forceStop)
+                {
+                    Logger.RaiseError("Synchronization stoped");
+                }
+                else
+                {
+                    if (errorsCount > 0)
+                    {
+                        Logger.RaiseError("Synchronization completed with errors (" + (DateTime.Now - start).TotalSeconds + " s)");
+                        forceStop = true;
+                    }
+                    else
+                    {
+                        Logger.RaiseLog("Synchronization completed (" + (DateTime.Now - start).TotalSeconds + " s)");
+                    }
                 }
             });
         }
 
-        private Double SizeCopy = 0, SizeDelete = 0;
-        
-        private void RecursiveCalcSizeCopy(CmpDirectory root)
+        private Double syncProgressInc, deleteProgressInc;
+
+        private String fromRootPath, toRootPath;
+
+        private Int32 errorsCount = 0;
+
+        private long RecursiveCalcCopySize(FSItem root)
         {
-            foreach (var dir in root.Directories)
+            long count = root.IsDirectory ? 0 : (root as FSFile).Length;
+
+            foreach (FSItem item in root.UnequalChildren)
             {
-                if (forceStop) return;
+                if (forceStop) return -1;
 
-                if (!dir.IsSyncing) continue;
-
-                RecursiveCalcSizeCopy(dir);
+                if (item.IsChecked == true) count += RecursiveCalcCopySize(item);
             }
 
-            foreach (var file in root.Files)
-            {
-                if (forceStop) return;
-
-                if (!file.IsSyncing) continue;
-
-                SizeCopy += file.FSFile.Length;
-            }
+            return count;
         }
 
-        private void RecursieveCalcSizeDelete(CmpDirectory root)
+        private Int32 RecursiveCalcDeleteCount(FSItem root)
         {
-            foreach (var dir in root.Directories)
+            Int32 count = root.IsDirectory || !root.IsUnique ? 0 : 1;
+
+            foreach (FSItem item in root.UnequalChildren)
             {
-                if (forceStop) return;
+                if (forceStop) return -1;
 
-                if (!dir.IsSyncing) continue;
-
-                RecursieveCalcSizeDelete(dir);
+                if (item.IsChecked == true) count += RecursiveCalcDeleteCount(item);
             }
 
-            foreach (var file in root.Files)
-            {
-                if (forceStop) return;
-
-                if (!file.IsSyncing) continue;
-
-                SizeDelete += file.FSFile.Length;
-            }
+            return count;
         }
 
-        private void RecursiveSync(CmpDirectory root, String fromRootPath, String toRootPath)
+        private void RecursiveSync(FSItem root)
         {
-            foreach (var dir in root.Directories)
+            foreach (FSItem item in root.UnequalChildren)
             {
                 if (forceStop) return;
 
-                if (!dir.IsSyncing) continue;
+                // Skip unselected
+                if (item.IsChecked == false) continue;
 
-                String newPath = FSActions.ConvertPath(dir.FullName, fromRootPath, toRootPath);
+                String newPath = FSActions.ConvertPath(item.FullName, fromRootPath, toRootPath);
 
-                if (dir.IsUnique)
-                    if (!FSActions.TryCreateDirectory(newPath))
-                        continue;
-
-                RecursiveSync(dir, fromRootPath, toRootPath);
-            }
-
-            foreach (var file in root.Files)
-            {
-                if (forceStop) return;
-
-                if (!file.IsSyncing) continue;
-
-                String newPath = FSActions.ConvertPath(file.FullName, fromRootPath, toRootPath);
-
-                if (file.IsUnique) FSActions.TryCopyFile(file.FullName, newPath, false);
+                // Create directory
+                if (item.IsDirectory)
+                {
+                    if (item.IsUnique)
+                    {
+                        if (!FSActions.TryCreateDirectory(newPath))
+                        {
+                            errorsCount++;
+                            continue;
+                        }
+                    }
+                    RecursiveSync(item);
+                }
+                // Copy file
                 else
                 {
-                    if (SAVE_MODE)
-                        FSActions.SaveFileToTemp(newPath, toRootPath, tempSaveFolder);
-                    FSActions.TryCopyFile(file.FullName, newPath, true);
+                    TryCopyFileStreamed(item.FullName, newPath);
                 }
-                Progress += file.FSFile.Length / SizeCopy;
             }
         }
 
-        private void RecursiveDelete(CmpDirectory root, String fromRootPath)
+        private void RecursiveDelete(FSItem root)
         {
-            foreach (var file in root.Files)
+            foreach (FSItem item in root.UnequalChildren)
             {
                 if (forceStop) return;
 
-                if (!file.IsUnique || !file.IsSyncing) continue;
+                // Skip unselected
+                if (item.IsChecked == false) continue;
 
-                if (SAVE_MODE)
-                    FSActions.SaveFileToTemp(file.FullName, fromRootPath, tempSaveFolder);
-                FSActions.TryDeleteFile(file.FullName);
+                // Delete directory
+                if (item.IsDirectory)
+                {
+                    RecursiveDelete(item);
 
-                Progress += file.FSFile.Length / SizeDelete;
-            }
-
-            foreach (var dir in root.Directories)
-            {
-                if (forceStop) return;
-
-                if (!dir.NestedFlags[0] || !dir.IsSyncing) continue;
-
-                RecursiveDelete(dir, fromRootPath);
-
-                if (dir.IsUnique) FSActions.TryDeleteDirectory(dir.FullName);
+                    if (!item.IsUnique) continue;
+                    if(!FSActions.TryDeleteDirectory(item.FullName)) errorsCount++;
+                }
+                // Delete file
+                else
+                {
+                    // Skip non-unique
+                    if (!item.IsUnique) continue;
+                    if (!FSActions.TryDeleteFile(item.FullName)) errorsCount++;
+                    Progress += deleteProgressInc;
+                }
             }
         }
-    }*/
+
+        private void TryCopyFileStreamed(String sourcePath, String destPath)
+        {
+            byte[] buffer = new byte[4 * 1024];
+            int c;
+            try
+            {
+                using FileStream fr = File.OpenRead(sourcePath);
+                using FileStream fw = File.OpenWrite(destPath);
+
+                while ((c = fr.Read(buffer, 0, buffer.Length)) > 0)
+                {
+                    if (forceStop)
+                    {
+                        fw.Close();
+                        FSActions.TryDeleteFile(destPath);
+                        return;
+                    }
+
+                    fw.Write(buffer, 0, c);
+                    Progress += syncProgressInc * c;
+                }
+
+                fr.Close();
+                fw.Close();
+
+                // Set flags
+                File.SetCreationTime(destPath, File.GetCreationTime(sourcePath));
+                File.SetLastAccessTime(destPath, File.GetLastAccessTime(sourcePath));
+                File.SetLastWriteTime(destPath, File.GetLastWriteTime(sourcePath));
+            }
+            catch (Exception ex)
+            {
+                errorsCount++;
+                Logger.RaiseError("Copy File Error: " + ex.Message + "\n" + destPath);
+            }
+        }
+    }
 }

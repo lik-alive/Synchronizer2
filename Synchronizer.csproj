@@ -4,18 +4,25 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\live_sync.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Resources\close.png" />
+    <None Remove="Libs\WpfControls.dll" />
+    <None Remove="Libs\WpfStyles.dll" />
     <None Remove="Resources\file.ico" />
     <None Remove="Resources\folder.ico" />
-    <None Remove="Resources\folder.png" />
     <None Remove="Resources\info.ico" />
     <None Remove="Resources\left.png" />
     <None Remove="Resources\live_sync.ico" />
     <None Remove="Resources\right.png" />
+    <None Remove="Resources\warning.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Libs\WpfControls.dll" />
+    <EmbeddedResource Include="Libs\WpfStyles.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,18 +30,29 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\close.png" />
+    <Reference Include="WpfControls">
+      <HintPath>Libs\WpfControls.dll</HintPath>
+    </Reference>
+    <Reference Include="WpfStyles">
+      <HintPath>Libs\WpfStyles.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\file.ico" />
     <Resource Include="Resources\folder.ico" />
-    <Resource Include="Resources\folder.png" />
     <Resource Include="Resources\info.ico" />
     <Resource Include="Resources\left.png" />
     <Resource Include="Resources\live_sync.ico" />
     <Resource Include="Resources\right.png" />
+    <Resource Include="Resources\warning.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Libs\" />
+    <Page Update="Styles\SynchronizeDialog.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

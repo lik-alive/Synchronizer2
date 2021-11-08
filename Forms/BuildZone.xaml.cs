@@ -1,23 +1,12 @@
-﻿using Synchronizer.Log;
-using Synchronizer.Model;
+﻿using Synchronizer.Model;
 using Synchronizer.Processing;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Synchronizer.Forms
 {
@@ -29,25 +18,19 @@ namespace Synchronizer.Forms
         public AsyncBase task;
 
         /// <summary>
-        /// Дерево объектов
+        /// Корневая папка
         /// </summary>
-        private FSDirectory tree;
+        public String Folder { get; private set; }
 
         /// <summary>
-        /// Получение дочерних объектов
+        /// Прогресс выполнения
         /// </summary>
-        public List<FSItem> Children
-        {
-            get
-            {
-                return tree != null ? tree.Children : null;
-            }
-        }
+        public Double Progress { get; private set; }
 
         /// <summary>
         /// Событие завершения построения дерева
         /// </summary>
-        public event Action Completed;
+        public event Action<FSTree> Completed;
 
         /// <summary>
         /// Событие прерывания построения дерева
@@ -57,30 +40,26 @@ namespace Synchronizer.Forms
         public BuildZone()
         {
             InitializeComponent();
+            DataContext = this;
         }
 
         public void BuildTree(String folder)
         {
+            OnPropertyChanged("Folder", folder);
+            OnPropertyChanged("Progress", 0);
+
             DirectoryInfo info = new DirectoryInfo(folder);
             Thread thread = new Thread(() =>
             {
-                // Build folder trees
-                DateTime start = DateTime.Now;
-                Logger.RaiseMessage("Build started");
-
                 FSBuilder fsb = new FSBuilder(info);
-                StartAndJoin(fsb);
-                if (fsb.IsAborted)
+                if (StartAndJoin(fsb))
                 {
-                    Dispatcher.Invoke(() => Aborted());
-                    return;
+                    Dispatcher.Invoke(() => Completed?.Invoke(fsb.Tree));
                 }
-
-                tree = fsb.Root;
-
-                Logger.RaiseMessage("Build completed (" + (DateTime.Now - start).TotalSeconds + " s)");
-                OnPropertyChanged("Children");
-                Dispatcher.Invoke(() => Completed());
+                else
+                {
+                    Dispatcher.Invoke(() => Aborted?.Invoke());
+                }
             });
             thread.Start();
         }
@@ -90,32 +69,32 @@ namespace Synchronizer.Forms
         /// </summary>
         /// <param name="task"></param>
         /// <param name="updateProgress"></param>
-        private void StartAndJoin(AsyncBase asyncBase)
+        private Boolean StartAndJoin(AsyncBase asyncBase)
         {
             task = asyncBase;
             task.Start();
 
+            // Monitor task progress
             while (task.IsRunning)
             {
-                progress_Update(task.Progress);
+                OnPropertyChanged("Progress", task.Progress);
                 Thread.Sleep(100);
             }
+
+            // Check for task failure
+            if (task.Status == AsyncBase.AsyncStatus.ABORTED) return false;
+
+            // Finalize progress increment
+            OnPropertyChanged("Progress", 100);
+
+            return true;
         }
 
-        /// <summary>
-        /// Обновление полосы прогресса
-        /// </summary>
-        /// <param name="obj"></param>
-        private void progress_Update(Double obj)
+        private void stop_Click(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
-            {
-                if (obj == -1) progressBar.IsIndeterminate = true;
-                else progressBar.IsIndeterminate = false;
-
-                progressBar.Value = obj;
-            }, System.Windows.Threading.DispatcherPriority.Input);
+            task.Abort();
         }
+
 
         #region INotifyPropertyChanged
 
@@ -123,16 +102,21 @@ namespace Synchronizer.Forms
 
         private void OnPropertyChanged(String propertyName)
         {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void OnPropertyChanged(String propertyName, Object value)
+        {
+            PropertyInfo prop = GetType().GetProperty(propertyName);
+            if (null != prop && prop.CanWrite)
+            {
+                prop.SetValue(this, value, null);
+            }
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
 
         #endregion
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            task.Abort();
-        }
     }
 }

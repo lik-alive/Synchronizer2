@@ -14,22 +14,22 @@ namespace Synchronizer.Processing
             }
             catch (Exception ex)
             {
-                Logger.RaiseMessage("Create Directory Error: " + ex.Message + "\n" + path);
+                Logger.RaiseError("Create Directory Error: " + ex.Message + "\n" + path);
                 return false;
             }
 
             return true;
         }
 
-        public static Boolean TryCopyFile(String sourcePath, String destPath, Boolean rewrite)
+        public static Boolean TryCopyFile(String sourcePath, String destPath, Boolean overwrite = true)
         {
             try
             {
-                File.Copy(sourcePath, destPath, rewrite);
+                File.Copy(sourcePath, destPath, overwrite);
             }
             catch (Exception ex)
             {
-                Logger.RaiseMessage("Copy File Error: " + ex.Message + "\n" + destPath);
+                Logger.RaiseError("Copy File Error: " + ex.Message + "\n" + destPath);
                 return false;
             }
 
@@ -44,7 +44,7 @@ namespace Synchronizer.Processing
             }
             catch (Exception ex)
             {
-                Logger.RaiseMessage("Delete Directory Error: " + ex.Message + "\n" + path);
+                Logger.RaiseError("Delete Directory Error: " + ex.Message + "\n" + path);
                 return false;
             }
 
@@ -59,29 +59,11 @@ namespace Synchronizer.Processing
             }
             catch (Exception ex)
             {
-                Logger.RaiseMessage("Delete File Error: " + ex.Message + "\n" + path);
+                Logger.RaiseError("Delete File Error: " + ex.Message + "\n" + path);
                 return false;
             }
 
             return true;
-        }
-
-        public static void SaveFileToTemp(String path, String rootPath, String tempRootPath)
-        {
-            String rootTmpPath = tempRootPath;
-            String subDirs = path.Substring(rootPath.Length + 1);
-            String tmpPath = Path.Combine(rootTmpPath, subDirs);
-
-            String[] items = subDirs.Split('\\');
-            for (Int32 i = 0; i < items.Length - 1; i++)
-            {
-                rootTmpPath = Path.Combine(rootTmpPath, items[i]);
-                if (!Directory.Exists(rootTmpPath))
-                    if (!TryCreateDirectory(rootTmpPath))
-                        throw new Exception("Can't create directory\n" + rootTmpPath);
-            }
-            if (!TryCopyFile(path, tmpPath, false))
-                throw new Exception("Can't save file to temp\n");
         }
 
         public static String ConvertPath(String path, String fromRootPath, String toRootPath)

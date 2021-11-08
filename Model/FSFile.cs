@@ -46,22 +46,5 @@ namespace Synchronizer.Model
         {
             Icon = iconFile;
         }
-
-        /// <summary>
-        /// Установка флагов для двойников
-        /// </summary>
-        /// <param name="twin"></param>
-        public static void SetTwinFlags(FSFile file1, FSFile file2)
-        {
-            file1.SetAllFlags(false, file1.LastWriteTime > file2.LastWriteTime,
-                                file1.LastWriteTime < file2.LastWriteTime,
-                                file1.Length > file2.Length,
-                                file1.Length < file2.Length);
-
-            file2.SetAllFlags(false, file1.LastWriteTime < file2.LastWriteTime,
-                                file1.LastWriteTime > file2.LastWriteTime,
-                                file1.Length < file2.Length,
-                                file1.Length > file2.Length);
-        }
     }
 }

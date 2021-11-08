@@ -8,7 +8,7 @@ namespace Synchronizer.Model
         #region Properties
 
         /// <summary>
-        /// Информация о файле
+        /// Информация о директории
         /// </summary>
         public new DirectoryInfo Info
         {

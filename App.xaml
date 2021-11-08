@@ -3,15 +3,19 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:local="clr-namespace:Synchronizer"
+             xmlns:cnvs="clr-namespace:Synchronizer.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        <ResourceDictionary x:Key="MaterialDesign">
+        <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime" />
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
                 <ResourceDictionary Source="/WpfStyles;component/WpfStyles.xaml" />
+                <ResourceDictionary Source="/Synchronizer;component/Styles/IconButton.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <cnvs:InvertableBooleanToVisibilityConverter x:Key="VisibleIfTrue" />
+            <cnvs:InvertableBooleanToVisibilityConverter x:Key="VisibleIfFalse" Inverted="True" />
+            <cnvs:InvertableBooleanToVisibilityConverter x:Key="VisibleIfTrueOrHide" Collapsed="False" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

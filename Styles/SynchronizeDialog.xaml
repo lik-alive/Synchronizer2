@@ -1,0 +1,51 @@
+﻿<Window x:Class="Synchronizer.Forms.SynchronizeDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Title="Confirmation" BorderBrush="#00A9EC" Height="270" Width="400" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown" Icon="/Synchronizer;component/Resources/info.ico" ResizeMode="NoResize" Background="#DDD">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="33" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,10" Orientation="Vertical">
+            <Label HorizontalAlignment="Center" FontSize="16">Are you sure want to synchronize?</Label>
+            <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Margin="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="40"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Padding="5,0" TextWrapping="Wrap" Text="{Binding LeftPath}" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" />
+                <materialDesign:PackIcon Visibility="{Binding IsLeftToRight, Converter={StaticResource VisibleIfTrue}}" Grid.Column="1" Width="40" Height="40" Kind="ChevronDoubleRight" />
+                <materialDesign:PackIcon Visibility="{Binding IsLeftToRight, Converter={StaticResource VisibleIfFalse}}" Grid.Column="1" Width="40" Height="40" Kind="ChevronDoubleLeft" />
+                <TextBlock Grid.Column="2" Padding="5,0" TextWrapping="Wrap" Text="{Binding RightPath}" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" />
+            </Grid>
+        </StackPanel>
+
+        <StackPanel Visibility="{Binding HasFileForDeletion, Converter={StaticResource VisibleIfTrue}}" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+            <CheckBox IsChecked="{Binding Duplicate}" FontWeight="Bold" Height="33">
+                <Label Content="Remove unique files in the destination folder" FontSize="14" Height="30" />
+            </CheckBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <Button x:Name="buttonYes" Height="35" Margin="10,10" Width="100" FontSize="16" Click="YES_Click" BorderThickness="0" Cursor="Hand">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon x:Name="iconYes" Width="22" VerticalAlignment="Stretch" Kind="Check" />
+                    <TextBlock x:Name="textYes" Text="Yes"></TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Height="35" Margin="10,10" Name="buttonNO" Width="100" FontSize="16" Click="NO_Click" BorderThickness="0" Cursor="Hand">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Width="22" VerticalAlignment="Stretch" Kind="Close" />
+                    <TextBlock>No</TextBlock>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+    
+</Window>

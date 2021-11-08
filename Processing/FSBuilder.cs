@@ -8,15 +8,26 @@ namespace Synchronizer.Processing
 {
     public class FSBuilder : AsyncBase
     {
-        public FSDirectory Root { get; private set; }
+        public FSTree Tree { get; private set; }
 
         public FSBuilder(DirectoryInfo directoryPath)
         {
-            Root = new FSDirectory(directoryPath, null);
+            Tree = new FSTree(new FSDirectory(directoryPath, null));
 
             execThread = new Thread(() =>
             {
-                RecursiveTreeBuild(Root, 100);
+                DateTime start = DateTime.Now;
+                Logger.RaiseLog("Build started");
+
+                RecursiveTreeBuild(Tree.Root, 100);
+
+                if (forceStop)
+                {
+                    Logger.RaiseError("Build stoped - " + directoryPath.FullName);
+                } else
+                {
+                    Logger.RaiseLog("Build completed  - " + directoryPath.FullName + " (" + (DateTime.Now - start).TotalSeconds + " s)");
+                }
             });
         }
 
@@ -25,9 +36,29 @@ namespace Synchronizer.Processing
             try
             {
                 DirectoryInfo di = root.Info as DirectoryInfo;
-                DirectoryInfo[] directories = di.GetDirectories();
-                FileInfo[] files = di.GetFiles();
+                DirectoryInfo[] directories = new DirectoryInfo[0];
+                try
+                {
+                    directories = di.GetDirectories();
+                } 
+                catch (Exception ex)
+                {
+                    Logger.RaiseError("Warning: " + ex.Message);
+                }
+                
+                FileInfo[] files = new FileInfo[0];
+                try
+                {
+                    files = di.GetFiles();
+                }
+                catch (Exception ex)
+                {
+                    Logger.RaiseError("Warning: " + ex.Message);
+                }
+
                 Double progressIncChild = progressInc / (directories.Length + 1);
+
+                Progress += progressIncChild;
 
                 //Process directories
                 foreach (DirectoryInfo directory in directories)
@@ -36,8 +67,6 @@ namespace Synchronizer.Processing
 
                     RecursiveTreeBuild(root.EmbedDirectory(directory), progressIncChild);
                 }
-
-                Progress += progressIncChild;
 
                 //Process files
                 foreach (FileInfo file in files)
@@ -49,7 +78,7 @@ namespace Synchronizer.Processing
             }
             catch (Exception ex)
             {
-                Logger.RaiseMessage("Error: " + ex.Message);
+                Logger.RaiseError("Error: " + ex.Message);
                 forceStop = true;
             }
         }

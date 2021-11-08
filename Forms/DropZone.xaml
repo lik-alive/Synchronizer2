@@ -25,9 +25,41 @@
         </DrawingBrush>
     </UserControl.BorderBrush>
     <Grid>
-        <StackPanel VerticalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="130" />
+        </Grid.RowDefinitions>
+        
+        <StackPanel Grid.Row="0" VerticalAlignment="Center">
             <TextBlock HorizontalAlignment="Center" FontSize="20">Drag and Drop a Folder Here</TextBlock>
-            <materialDesign:PackIcon Height="80" Width="80" Kind="FolderOpenOutline" Margin="10"  HorizontalAlignment="Center"/>
+            <Button Margin="5" Style="{StaticResource IconButton}" ToolTip="Browse..." Click="browse_Click" Width="100" Height="90">
+                <materialDesign:PackIcon Height="80" Width="80" Kind="FolderOpenOutline" Margin="10"  HorizontalAlignment="Center"/>
+            </Button>
         </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto">
+            <ItemsControl ItemsSource="{Binding LastFolders}" Margin="5,0,5,10" Focusable="False">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Margin="5,0" Width="150" Height="100" BorderThickness="0" Padding="7,4" Cursor="Hand" Click="LastFolder_Click" ToolTip="{Binding Path}">
+                            <Grid Height="100">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Content="{Binding ShortPath}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Padding="0"/>
+                                <TextBlock MaxHeight="50" Grid.Row="1" Text="{Binding Path}" TextWrapping="Wrap" FontSize="12" Foreground="#555" VerticalAlignment="Top" />
+                            </Grid>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </UserControl>
