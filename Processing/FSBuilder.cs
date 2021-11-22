@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using Synchronizer.Model;
-using Synchronizer.Log;
+using Synchronizer2.Model;
+using Synchronizer2.Log;
 
-namespace Synchronizer.Processing
+namespace Synchronizer2.Processing
 {
     public class FSBuilder : AsyncBase
     {

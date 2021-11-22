@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Synchronizer.Model
+namespace Synchronizer2.Model
 {
     public class FSTree
     {

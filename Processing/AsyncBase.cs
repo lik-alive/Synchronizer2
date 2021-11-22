@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Synchronizer.Processing
+namespace Synchronizer2.Processing
 {
     public class AsyncBase
     {

@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\live_sync.ico</ApplicationIcon>
-    <AssemblyName>Synchronizer</AssemblyName>
+    <AssemblyName>Synchronizer2</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,19 +15,13 @@
     <None Remove="Resources\file.ico" />
     <None Remove="Resources\folder.ico" />
     <None Remove="Resources\info.ico" />
-    <None Remove="Resources\left.png" />
     <None Remove="Resources\live_sync.ico" />
-    <None Remove="Resources\right.png" />
     <None Remove="Resources\warning.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Libs\WpfControls.dll" />
-    <Resource Include="Libs\WpfStyles.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MaterialDesignThemes" Version="4.2.1" />
+    <EmbeddedResource Include="Libs\WpfControls.dll" />
+    <EmbeddedResource Include="Libs\WpfStyles.dll" />
   </ItemGroup>
 
   <ItemGroup>
@@ -43,9 +37,7 @@
     <Resource Include="Resources\file.ico" />
     <Resource Include="Resources\folder.ico" />
     <Resource Include="Resources\info.ico" />
-    <Resource Include="Resources\left.png" />
     <Resource Include="Resources\live_sync.ico" />
-    <Resource Include="Resources\right.png" />
     <Resource Include="Resources\warning.ico" />
   </ItemGroup>
 

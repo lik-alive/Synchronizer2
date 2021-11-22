@@ -5,7 +5,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 
-namespace Synchronizer.Model
+namespace Synchronizer2.Model
 {
     public abstract class FSItem : INotifyPropertyChanged
     {
@@ -262,12 +262,12 @@ namespace Synchronizer.Model
         /// <summary>
         /// Иконка папки
         /// </summary>
-        protected static Uri iconFolder = new Uri("/Synchronizer;component/Resources/folder.ico", UriKind.RelativeOrAbsolute);
+        protected static Uri iconFolder = new Uri("/Synchronizer2;component/Resources/folder.ico", UriKind.RelativeOrAbsolute);
 
         /// <summary>
         /// Иконка файла
         /// </summary>
-        protected static Uri iconFile = new Uri("/Synchronizer;component/Resources/file.ico", UriKind.RelativeOrAbsolute);
+        protected static Uri iconFile = new Uri("/Synchronizer2;component/Resources/file.ico", UriKind.RelativeOrAbsolute);
 
         /// <summary>
         /// Иконка объекта

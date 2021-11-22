@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Synchronizer.Log
+namespace Synchronizer2.Log
 {
     public class LogItem
     {

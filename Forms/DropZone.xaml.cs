@@ -1,5 +1,5 @@
-﻿using Synchronizer.Log;
-using Synchronizer.Processing;
+﻿using Synchronizer2.Log;
+using Synchronizer2.Processing;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,7 +20,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Synchronizer.Forms
+namespace Synchronizer2.Forms
 {
     /// <summary>
     /// Ранее посещённый путь
@@ -128,7 +128,7 @@ namespace Synchronizer.Forms
         {
             System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog();
 
-            fbd.SelectedPath = history[0];
+            if (history.Count > 0) fbd.SelectedPath = history[0];
             if (fbd.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 checkFolder(fbd.SelectedPath);

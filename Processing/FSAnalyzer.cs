@@ -1,10 +1,10 @@
-﻿using Synchronizer.Log;
-using Synchronizer.Model;
+﻿using Synchronizer2.Log;
+using Synchronizer2.Model;
 using System;
 using System.Threading;
 
 
-namespace Synchronizer.Processing
+namespace Synchronizer2.Processing
 {
     public class FSAnalyzer : AsyncBase
     {

@@ -1,10 +1,10 @@
-﻿using Synchronizer.Log;
-using Synchronizer.Model;
+﻿using Synchronizer2.Log;
+using Synchronizer2.Model;
 using System;
 using System.IO;
 using System.Threading;
 
-namespace Synchronizer.Processing
+namespace Synchronizer2.Processing
 {
     public class FSSyncher : AsyncBase
     {
@@ -157,24 +157,24 @@ namespace Synchronizer.Processing
             int c;
             try
             {
-                using FileStream fr = File.OpenRead(sourcePath);
-                using FileStream fw = File.OpenWrite(destPath);
-
-                while ((c = fr.Read(buffer, 0, buffer.Length)) > 0)
+                using (FileStream fr = File.OpenRead(sourcePath))
                 {
-                    if (forceStop)
+                    using (FileStream fw = File.OpenWrite(destPath))
                     {
-                        fw.Close();
-                        FSActions.TryDeleteFile(destPath);
-                        return;
+                        while ((c = fr.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            if (forceStop)
+                            {
+                                fw.Close();
+                                FSActions.TryDeleteFile(destPath);
+                                return;
+                            }
+
+                            fw.Write(buffer, 0, c);
+                            Progress += syncProgressInc * c;
+                        }
                     }
-
-                    fw.Write(buffer, 0, c);
-                    Progress += syncProgressInc * c;
                 }
-
-                fr.Close();
-                fw.Close();
 
                 // Set flags
                 File.SetCreationTime(destPath, File.GetCreationTime(sourcePath));

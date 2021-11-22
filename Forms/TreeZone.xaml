@@ -1,14 +1,39 @@
-﻿<UserControl x:Class="Synchronizer.Forms.TreeZone"
+﻿<UserControl x:Class="Synchronizer2.Forms.TreeZone"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Synchronizer.Forms"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:Synchronizer2.Forms"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="900">
     <UserControl.Resources>
         <ResourceDictionary>
+            <Style x:Key="mdi_FolderSearchStyle" TargetType="Path">
+                <Setter Property="Fill" Value="Black"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+                <Setter Property="Data" Value="{Binding Data, Source={StaticResource mdi_FolderSearch}}" />
+            </Style>
+            <Style x:Key="mdi_ArrowExpandAllStyle" TargetType="Path">
+                <Setter Property="Fill" Value="White"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+                <Setter Property="Data" Value="{Binding Data, Source={StaticResource mdi_ArrowExpandAll}}" />
+            </Style>
+            <Style x:Key="mdi_ArrowCollapseAllStyle" TargetType="Path">
+                <Setter Property="Fill" Value="White"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+                <Setter Property="Data" Value="{Binding Data, Source={StaticResource mdi_ArrowCollapseAll}}" />
+            </Style>
+            <Style x:Key="mdi_RefreshStyle" TargetType="Path">
+                <Setter Property="Fill" Value="White"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+                <Setter Property="Data" Value="{Binding Data, Source={StaticResource mdi_Refresh}}" />
+            </Style>
+            <Style x:Key="mdi_CloseStyle" TargetType="Path">
+                <Setter Property="Fill" Value="White"/>
+                <Setter Property="Stretch" Value="Uniform"/>
+                <Setter Property="Data" Value="{Binding Data, Source={StaticResource mdi_Close}}" />
+            </Style>
+
             <Style x:Key="TreeViewItemStyle" TargetType="TreeViewItem">
                 <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
                 <Setter Property="Background" Value="Transparent" />
@@ -61,7 +86,7 @@
 
                             <MenuItem Header="Open in File Explorer" Click="explorer_Click">
                                 <MenuItem.Icon>
-                                    <materialDesign:PackIcon Kind="FolderSearch" />    
+                                    <Path Style="{StaticResource mdi_FolderSearchStyle}" />
                                 </MenuItem.Icon>
                             </MenuItem>
                         </ContextMenu>
@@ -112,7 +137,7 @@
             </Grid.RowDefinitions>
 
             <Border Grid.Row="0" Background="#00A9EC" VerticalAlignment="Stretch">
-                <TextBlock Text="{Binding Tree.FullName}" FontSize="18" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" Margin="10,0,110,0" ToolTip="{Binding Tree.FullName}" />
+                <TextBlock Text="{Binding Tree.FullName}" FontSize="18" FontWeight="SemiBold" Foreground="White" VerticalAlignment="Center" Margin="10,0,160,0" ToolTip="{Binding Tree.FullName}" />
             </Border>
             <TreeView x:Name="treeView" Grid.Row="1" VirtualizingStackPanel.IsVirtualizing="True"
                 ItemContainerStyle="{StaticResource TreeViewItemStyle}" 
@@ -123,16 +148,16 @@
         <Canvas>
             <StackPanel Canvas.Right="10" Canvas.Top="0" Orientation="Horizontal" IsEnabled="{Binding ShowActions}">
                 <Button Visibility="{Binding IsExpandAll, Converter={StaticResource VisibleIfFalse}}" Style="{StaticResource IconButton}" Margin="5,0" Foreground="White" ToolTip="Expand all" Click="expandAll_Click">
-                    <materialDesign:PackIcon Kind="ArrowExpandAll" />
+                    <Path Style="{StaticResource mdi_ArrowExpandAllStyle}" Margin="7" />
                 </Button>
                 <Button Visibility="{Binding IsExpandAll, Converter={StaticResource VisibleIfTrue}}" Style="{StaticResource IconButton}" Margin="5,0" Foreground="White" ToolTip="Collapse all" Click="expandAll_Click">
-                    <materialDesign:PackIcon Kind="ArrowCollapseAll" />
+                    <Path Style="{StaticResource mdi_ArrowCollapseAllStyle}" Margin="7" />
                 </Button>
                 <Button Margin="5,0" Style="{StaticResource IconButton}" ToolTip="Refresh all files" Foreground="White" Click="refresh_Click">
-                    <materialDesign:PackIcon Kind="Refresh" />
+                    <Path Style="{StaticResource mdi_RefreshStyle}" Margin="7" />
                 </Button>
                 <Button Margin="5,0" Style="{StaticResource IconButton}" ToolTip="Close folder" Foreground="White" Click="close_Click">
-                    <materialDesign:PackIcon Height="30" Width="30" Kind="Close" />
+                    <Path Style="{StaticResource mdi_CloseStyle}" Margin="7" />
                 </Button>
             </StackPanel>
         </Canvas>

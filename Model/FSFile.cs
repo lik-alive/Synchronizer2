@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Synchronizer.Model
+namespace Synchronizer2.Model
 {
     public class FSFile : FSItem
     {

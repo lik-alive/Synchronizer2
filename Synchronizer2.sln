@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31729.503
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synchronizer", "Synchronizer.csproj", "{2DC2C2F1-EEFB-4FF4-BBB9-38AE10C2860A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Synchronizer2", "Synchronizer2.csproj", "{2DC2C2F1-EEFB-4FF4-BBB9-38AE10C2860A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

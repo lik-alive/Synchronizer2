@@ -1,8 +1,32 @@
-﻿<Window x:Class="Synchronizer.Forms.SynchronizeDialog"
+﻿<Window x:Class="Synchronizer2.Forms.SynchronizeDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-        Title="Confirmation" BorderBrush="#00A9EC" Height="270" Width="400" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown" Icon="/Synchronizer;component/Resources/info.ico" ResizeMode="NoResize" Background="#DDD">
+        Title="Confirmation" BorderBrush="#00A9EC" Height="270" Width="400" WindowStartupLocation="CenterScreen" Icon="/Synchronizer2;component/Resources/info.ico" ResizeMode="NoResize" Background="#DDD">
+    <Window.Resources>
+        <Style x:Key="mdi_ChevronDoubleRightStyle" TargetType="Path">
+            <Setter Property="Fill" Value="Black"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Data" Value="{Binding Data, Source={StaticResource mdi_ChevronDoubleRight}}" />
+        </Style>
+
+        <Style x:Key="mdi_ChevronDoubleLeftStyle" TargetType="Path">
+            <Setter Property="Fill" Value="Black"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Data" Value="{Binding Data, Source={StaticResource mdi_ChevronDoubleLeft}}" />
+        </Style>
+
+        <Style x:Key="mdi_CheckStyle" TargetType="Path">
+            <Setter Property="Fill" Value="Black"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Data" Value="{Binding Data, Source={StaticResource mdi_Check}}" />
+        </Style>
+
+        <Style x:Key="mdi_CloseStyle" TargetType="Path">
+            <Setter Property="Fill" Value="Black"/>
+            <Setter Property="Stretch" Value="Uniform"/>
+            <Setter Property="Data" Value="{Binding Data, Source={StaticResource mdi_Close}}" />
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -20,28 +44,28 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock Grid.Column="0" Padding="5,0" TextAlignment="Center" TextWrapping="Wrap" Text="{Binding LeftPath}" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" />
-                <materialDesign:PackIcon Visibility="{Binding IsLeftToRight, Converter={StaticResource VisibleIfTrue}}" Grid.Column="1" Width="40" Height="40" Kind="ChevronDoubleRight" />
-                <materialDesign:PackIcon Visibility="{Binding IsLeftToRight, Converter={StaticResource VisibleIfFalse}}" Grid.Column="1" Width="40" Height="40" Kind="ChevronDoubleLeft" />
+                <Path Visibility="{Binding IsLeftToRight, Converter={StaticResource VisibleIfTrue}}" Grid.Column="1" Width="30" Height="30" Style="{StaticResource mdi_ChevronDoubleRightStyle}" />
+                <Path Visibility="{Binding IsLeftToRight, Converter={StaticResource VisibleIfFalse}}" Grid.Column="1" Width="30" Height="30" Style="{StaticResource mdi_ChevronDoubleLeftStyle}" />
                 <TextBlock Grid.Column="2" Padding="5,0" TextAlignment="Center" TextWrapping="Wrap" Text="{Binding RightPath}" HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" />
             </Grid>
         </StackPanel>
 
         <StackPanel Visibility="{Binding HasFileForDeletion, Converter={StaticResource VisibleIfTrue}}" Grid.Row="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
-            <CheckBox IsChecked="{Binding Duplicate}" FontWeight="Bold" Height="33">
-                <Label Content="Remove unique files in the destination folder" FontSize="14" Height="30" />
+            <CheckBox IsChecked="{Binding Duplicate}" FontWeight="Bold" VerticalAlignment="Center" VerticalContentAlignment="Center">
+                <Label Content="Remove unique files in the destination folder" FontSize="14" VerticalAlignment="Center"/>
             </CheckBox>
         </StackPanel>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
             <Button x:Name="buttonYes" Height="35" Margin="10,10" Width="100" FontSize="16" Click="YES_Click" BorderThickness="0" Cursor="Hand">
                 <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon x:Name="iconYes" Width="22" VerticalAlignment="Stretch" Kind="Check" />
+                    <Path x:Name="iconYes" Style="{StaticResource mdi_CheckStyle}" Width="10" Margin="5,0" />
                     <TextBlock x:Name="textYes" Text="Yes"></TextBlock>
                 </StackPanel>
             </Button>
             <Button Height="35" Margin="10,10" Name="buttonNO" Width="100" FontSize="16" Click="NO_Click" BorderThickness="0" Cursor="Hand">
                 <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Width="22" VerticalAlignment="Stretch" Kind="Close" />
+                    <Path Style="{StaticResource mdi_CloseStyle}" Width="10" Margin="5,0" />
                     <TextBlock>No</TextBlock>
                 </StackPanel>
             </Button>

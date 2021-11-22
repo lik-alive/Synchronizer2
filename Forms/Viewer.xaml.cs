@@ -1,4 +1,4 @@
-﻿using Synchronizer.Model;
+﻿using Synchronizer2.Model;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Synchronizer.Forms
+namespace Synchronizer2.Forms
 {
     public partial class Viewer : UserControl, INotifyPropertyChanged
     {

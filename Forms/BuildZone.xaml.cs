@@ -1,5 +1,5 @@
-﻿using Synchronizer.Model;
-using Synchronizer.Processing;
+﻿using Synchronizer2.Model;
+using Synchronizer2.Processing;
 using System;
 using System.ComponentModel;
 using System.IO;
@@ -8,7 +8,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Synchronizer.Forms
+namespace Synchronizer2.Forms
 {
     public partial class BuildZone : UserControl, INotifyPropertyChanged
     {

@@ -6,13 +6,13 @@ using System.Windows.Input;
 using System.IO;
 using System.ComponentModel;
 using System.Threading;
-using Synchronizer.Model;
-using Synchronizer.Forms;
-using Synchronizer.Processing;
+using Synchronizer2.Model;
+using Synchronizer2.Forms;
+using Synchronizer2.Processing;
 using System.Reflection;
 using System.Windows.Media;
 
-namespace Synchronizer
+namespace Synchronizer2
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

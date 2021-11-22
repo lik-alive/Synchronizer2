@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Synchronizer.Forms
+namespace Synchronizer2.Forms
 {
     public class GlobalState
     {

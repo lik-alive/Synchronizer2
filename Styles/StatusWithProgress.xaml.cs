@@ -1,4 +1,4 @@
-﻿using Synchronizer.Log;
+﻿using Synchronizer2.Log;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Synchronizer.Styles
+namespace Synchronizer2.Styles
 {
     /// <summary>
     /// Interaction logic for StatusWithProgress.xaml

@@ -1,4 +1,4 @@
-﻿using Synchronizer.Model;
+﻿using Synchronizer2.Model;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -7,7 +7,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace Synchronizer.Forms
+namespace Synchronizer2.Forms
 {
     public partial class TreeZone : UserControl, INotifyPropertyChanged
     {

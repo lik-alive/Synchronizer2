@@ -1,8 +1,8 @@
-﻿using Synchronizer.Log;
+﻿using Synchronizer2.Log;
 using System;
 using System.IO;
 
-namespace Synchronizer.Processing
+namespace Synchronizer2.Processing
 {
     public class FSActions
     {
