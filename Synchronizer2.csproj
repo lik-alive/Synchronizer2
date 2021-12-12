@@ -7,6 +7,8 @@
 	<UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\live_sync.ico</ApplicationIcon>
     <AssemblyName>Synchronizer2</AssemblyName>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
