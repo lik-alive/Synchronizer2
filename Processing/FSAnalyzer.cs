@@ -13,7 +13,7 @@ namespace Synchronizer2.Processing
             execThread = new Thread(() =>
             {
                 DateTime start = DateTime.Now;
-                Logger.RaiseLog("Analysis started");
+                Logger.RaiseLog("Analysis started...");
 
                 // Clear all flags
                 tree1.Root.Clear();
@@ -158,6 +158,8 @@ namespace Synchronizer2.Processing
             {
                 foreach (FSItem item in root.UnequalChildren)
                 {
+                    if (forceStop) return;
+
                     // All children is checked already
                     if (root.IsChecked == true) continue;
 

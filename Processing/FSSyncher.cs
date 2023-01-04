@@ -13,7 +13,7 @@ namespace Synchronizer2.Processing
             execThread = new Thread(() =>
             {
                 DateTime start = DateTime.Now;
-                Logger.RaiseLog("Synchronization started");
+                Logger.RaiseLog("Synchronization started...");
 
                 // Calc files count
                 long copySize = RecursiveCalcCopySize(tree1.Root);
