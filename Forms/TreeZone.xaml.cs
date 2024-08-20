@@ -53,7 +53,7 @@ namespace Synchronizer2.Forms
             GlobalState.Instance.IsExpandAllChanged += () =>
             {
                 OnPropertyChanged("IsExpandAll");
-                if (Tree.Root != null) Tree.Root.SetIsExpandedAll(IsExpandAll, Tree.IsAnalyzed);
+                Tree.Root?.SetIsExpandedAll(IsExpandAll, Tree.IsAnalyzed);
             };
         }
 
@@ -63,10 +63,7 @@ namespace Synchronizer2.Forms
         /// <param name="tree"></param>
         public void Redraw(FSTree tree)
         {
-            if (tree.Root != null)
-            {
-                tree.Root.SetIsExpandedAll(IsExpandAll, Tree.IsAnalyzed);
-            }
+            tree.Root?.SetIsExpandedAll(IsExpandAll, Tree.IsAnalyzed);
             OnPropertyChanged("Tree", tree);
         }
 
@@ -132,13 +129,12 @@ namespace Synchronizer2.Forms
         /// <param name="e"></param>
         private void treeItem_GotFocus(object sender, RoutedEventArgs e)
         {
-            FSItem item = (sender as TreeViewItem).DataContext as FSItem;
-            if (item != null && item.Twin != null)
+            if ((sender as TreeViewItem).DataContext is FSItem item && item.Twin != null)
             {
                 item.Twin.IsShadowSelected = true;
                 e.Handled = true;
             }
-         }
+        }
 
         /// <summary>
         /// Обработка события потери фокуса
@@ -147,8 +143,7 @@ namespace Synchronizer2.Forms
         /// <param name="e"></param>
         private void treeItem_LostFocus(object sender, RoutedEventArgs e)
         {
-            FSItem item = (sender as TreeViewItem).DataContext as FSItem;
-            if (item != null && item.Twin != null)
+            if ((sender as TreeViewItem).DataContext is FSItem item && item.Twin != null)
             {
                 item.Twin.IsShadowSelected = false;
                 e.Handled = true;

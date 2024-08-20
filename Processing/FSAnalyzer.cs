@@ -13,7 +13,7 @@ namespace Synchronizer2.Processing
             execThread = new Thread(() =>
             {
                 DateTime start = DateTime.Now;
-                Logger.RaiseLog("Analysis started...");
+                Logger.RaiseLog("Analysis in progress...");
 
                 // Clear all flags
                 tree1.Root.Clear();
@@ -44,17 +44,24 @@ namespace Synchronizer2.Processing
 
         private Double progressInc;
 
-        private Int32 RecursiveCalcCount(FSItem item)
+        private Int32 RecursiveCalcCount(FSDirectory item)
         {
             Int32 count = 1;
             foreach (FSItem child in item.Children)
             {
-                count += RecursiveCalcCount(child);
+                if (child.IsDirectory)
+                {
+                    count += RecursiveCalcCount(child as FSDirectory);
+                } else
+                {
+                    count++;
+                }
+                
             }
             return count;
         }
 
-        private void RecursiveAnalysis(FSItem root1, FSItem root2)
+        private void RecursiveAnalysis(FSDirectory root1, FSDirectory root2)
         {
             // Compare items
             foreach (FSItem item1 in root1.Children)
@@ -73,8 +80,8 @@ namespace Synchronizer2.Processing
 
                         if (item1.IsDirectory)
                         {
-                            RecursiveAnalysis(item1, item2);
-                        } 
+                            RecursiveAnalysis(item1 as FSDirectory, item2 as FSDirectory);
+                        }
                         else
                         {
                             CompareFiles(item1, item2);
@@ -85,28 +92,25 @@ namespace Synchronizer2.Processing
             }
 
             // Set nested flags
-            if (root1.IsDirectory)
+            Boolean equal1 = true;
+            foreach (FSItem item1 in root1.Children)
             {
-                Boolean equal1 = true;
-                foreach (FSItem item1 in root1.Children)
-                {
-                    equal1 &= item1.IsEqual;
-                    root1.NestedFlags[0] |= item1.NestedFlags[0] | item1.IsUnique;
-                    for (Int32 i = 1; i < 5; i++)
-                        root1.NestedFlags[i] |= item1.NestedFlags[i];
-                }
-
-                Boolean equal2 = true;
-                foreach (FSItem item2 in root2.Children)
-                {
-                    equal2 &= item2.IsEqual;
-                    root2.NestedFlags[0] |= item2.NestedFlags[0] | item2.IsUnique;
-                    for (Int32 i = 1; i < 5; i++)
-                        root2.NestedFlags[i] |= item2.NestedFlags[i];
-                }
-
-                if (equal1 && equal2) FSItem.SetEquals(root1, root2);
+                equal1 &= item1.IsEqual;
+                root1.NestedFlags[0] |= item1.NestedFlags[0] | item1.IsUnique;
+                for (Int32 i = 1; i < 5; i++)
+                    root1.NestedFlags[i] |= item1.NestedFlags[i];
             }
+
+            Boolean equal2 = true;
+            foreach (FSItem item2 in root2.Children)
+            {
+                equal2 &= item2.IsEqual;
+                root2.NestedFlags[0] |= item2.NestedFlags[0] | item2.IsUnique;
+                for (Int32 i = 1; i < 5; i++)
+                    root2.NestedFlags[i] |= item2.NestedFlags[i];
+            }
+
+            if (equal1 && equal2) FSItem.SetEquals(root1, root2);
         }
 
         /// <summary>
@@ -151,21 +155,27 @@ namespace Synchronizer2.Processing
         /// Установка статуса выбора только для файлов, требующих синхронизации
         /// </summary>
         /// <param name="root"></param>
-        private void SetCheckStatuses(FSItem root)
+        private void SetCheckStatuses(FSDirectory root)
         {
-            // Status is specified by childrens'
+            // В процессе анализа все дочерние файлы отмечены для синхронизации (как следствие, отмечена и родительская папка)
+            if (root.IsChecked == true) return;
+
             if (root.UnequalChildren.Count > 0)
             {
                 foreach (FSItem item in root.UnequalChildren)
                 {
                     if (forceStop) return;
 
-                    // All children is checked already
-                    if (root.IsChecked == true) continue;
-
-                    SetCheckStatuses(item);
+                    if (item.IsDirectory)
+                    {
+                        SetCheckStatuses(item as FSDirectory);
+                    }
+                    else
+                    {
+                        if (item.IsUnique) item.IsChecked = true;
+                    }
                 }
-            } 
+            }
             else
             {
                 if (root.IsUnique && root.Parent != null) root.IsChecked = true;

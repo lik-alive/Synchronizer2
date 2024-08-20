@@ -17,7 +17,7 @@ namespace Synchronizer2.Processing
             execThread = new Thread(() =>
             {
                 DateTime start = DateTime.Now;
-                Logger.RaiseLog("Build started...");
+                Logger.RaiseLog("Build in progress...");
 
                 RecursiveTreeBuild(Tree.Root, 100);
 

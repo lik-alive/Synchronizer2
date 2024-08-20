@@ -23,7 +23,7 @@ namespace Synchronizer2.Model
         {
             get
             {
-                return Root != null ? Root.UnequalChildren : null;
+                return Root?.UnequalChildren;
             }
         }
 
@@ -35,7 +35,7 @@ namespace Synchronizer2.Model
         public FSTree(FSDirectory root)
         {
             Root = root;
-            FullName = root != null ? Root.FullName : null;
+            FullName = root?.FullName;
         }
     }
 }

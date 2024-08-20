@@ -59,6 +59,17 @@ namespace Synchronizer2
         }
 
         /// <summary>
+        /// Закрытие программы
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mainWindow_Closed(object sender, EventArgs e)
+        {
+            // Прерывание текущего процесса
+            task?.Abort();
+        }
+
+        /// <summary>
         /// Обработка смены текущей стадии
         /// </summary>
         private void Instance_StageChanged()
@@ -206,13 +217,13 @@ namespace Synchronizer2
         /// </summary>
         /// <param name="root"></param>
         /// <returns></returns>
-        private Boolean HasFileForDeletion(FSItem root)
+        private Boolean HasFileForDeletion(FSDirectory root)
         {
             foreach (FSItem item in root.Children)
             {
                 if (item.IsChecked == true && item.IsUnique) return true;
 
-                if (item.IsDirectory && HasFileForDeletion(item)) return true;
+                if (item.IsDirectory && HasFileForDeletion(item as FSDirectory)) return true;
             }
 
             return false;
@@ -303,5 +314,6 @@ namespace Synchronizer2
         }
 
         #endregion
+
     }
 }

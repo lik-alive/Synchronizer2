@@ -13,7 +13,7 @@ namespace Synchronizer2.Processing
             execThread = new Thread(() =>
             {
                 DateTime start = DateTime.Now;
-                Logger.RaiseLog("Synchronization started...");
+                Logger.RaiseLog("Synchronization in progress...");
 
                 // Calc files count
                 long copySize = RecursiveCalcCopySize(tree1.Root);
@@ -62,35 +62,43 @@ namespace Synchronizer2.Processing
 
         private Int32 errorsCount = 0;
 
-        private long RecursiveCalcCopySize(FSItem root)
+        private long RecursiveCalcCopySize(FSDirectory root)
         {
-            long count = root.IsDirectory ? 0 : (root as FSFile).Length;
+            long count = 0;
 
             foreach (FSItem item in root.UnequalChildren)
             {
                 if (forceStop) return -1;
 
-                if (item.IsChecked != false) count += RecursiveCalcCopySize(item);
+                if (item.IsChecked != false)
+                {
+                    if (item.IsDirectory) count += RecursiveCalcCopySize(item as FSDirectory);
+                    else count += (item as FSFile).Length;
+                }
             }
 
             return count;
         }
 
-        private Int32 RecursiveCalcDeleteCount(FSItem root)
+        private Int32 RecursiveCalcDeleteCount(FSDirectory root)
         {
-            Int32 count = root.IsDirectory || !root.IsUnique ? 0 : 1;
+            Int32 count = 0;
 
             foreach (FSItem item in root.UnequalChildren)
             {
                 if (forceStop) return -1;
 
-                if (item.IsChecked == true) count += RecursiveCalcDeleteCount(item);
+                if (item.IsChecked == true)
+                {
+                    if (item.IsDirectory) count += RecursiveCalcDeleteCount(item as FSDirectory);
+                    else count += root.IsUnique ? 1 : 0;
+                }
             }
 
             return count;
         }
 
-        private void RecursiveSync(FSItem root)
+        private void RecursiveSync(FSDirectory root)
         {
             foreach (FSItem item in root.UnequalChildren)
             {
@@ -112,7 +120,7 @@ namespace Synchronizer2.Processing
                             continue;
                         }
                     }
-                    RecursiveSync(item);
+                    RecursiveSync(item as FSDirectory);
                 }
                 // Copy file
                 else
@@ -123,7 +131,7 @@ namespace Synchronizer2.Processing
             }
         }
 
-        private void RecursiveDelete(FSItem root)
+        private void RecursiveDelete(FSDirectory root)
         {
             foreach (FSItem item in root.UnequalChildren)
             {
@@ -135,10 +143,10 @@ namespace Synchronizer2.Processing
                 // Delete directory
                 if (item.IsDirectory)
                 {
-                    RecursiveDelete(item);
+                    RecursiveDelete(item as FSDirectory);
 
                     if (!item.IsUnique) continue;
-                    if(!FSActions.TryDeleteDirectory(item.FullName)) errorsCount++;
+                    if (!FSActions.TryDeleteDirectory(item.FullName)) errorsCount++;
                 }
                 // Delete file
                 else
