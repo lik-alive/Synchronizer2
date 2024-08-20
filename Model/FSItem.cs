@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Windows;
-using System.Windows.Media;
 
 namespace Synchronizer2.Model
 {
@@ -60,24 +58,11 @@ namespace Synchronizer2.Model
         public FSDirectory Parent { get; protected set; }
 
         /// <summary>
-        /// Дочерние объекты (папки + файлы)
+        /// Заглушка для корректного отображения дерева объектов
         /// </summary>
-        public List<FSItem> Children { get; protected set; } = new List<FSItem>();
-
-        /// <summary>
-        /// Различающиеся дочерние объекты (папки + файлы)
-        /// </summary>
-        public List<FSItem> UnequalChildren
+        public virtual List<FSItem> UnequalChildren
         {
-            get
-            {
-                List<FSItem> res = new List<FSItem>();
-                foreach (FSItem item in Children)
-                {
-                    if (!item.IsEqual) res.Add(item);
-                }
-                return res;
-            }
+            get;
         }
 
         #endregion
@@ -154,13 +139,8 @@ namespace Synchronizer2.Model
         /// <summary>
         /// Рекурсивная чистка всех флагов
         /// </summary>
-        public void Clear()
+        public virtual void Clear()
         {
-            foreach (FSItem item in Children)
-            {
-                item.Clear();
-            }
-
             isExpanded = false;
             isChecked = false;
             Twin = null;
@@ -186,73 +166,35 @@ namespace Synchronizer2.Model
             get { return isChecked; }
             set
             {
-                SetCheckedDown(value);
-                if (Twin != null) Twin.SetCheckedDown(value);
+                // Обновление статуса выбора текущего элемента и вниз по дереву
+                UpdateCheckedThisAndDown(value);
+                Twin?.UpdateCheckedThisAndDown(value);
 
-                if (Parent != null) Parent.VerifyCheckState();
+                // Проверка корректности статуса выбора вверх по дереву
+                Parent?.VerifyCheckUp();
+                Twin?.Parent?.VerifyCheckUp();
             }
         }
 
         /// <summary>
-        /// Установка статуса выбора объекта
+        /// Установка статуса выбора объекта и вызов обновления интерфейса
         /// </summary>
         /// <param name="value"></param>
-        private void SetChecked(Boolean? value)
+        protected void SetChecked(Boolean? value)
         {
             isChecked = value;
             OnPropertyChanged("IsChecked");
         }
 
         /// <summary>
-        /// Установка статуса выбора объекта вниз по дереву
+        /// Обновление статуса выбора объекта вниз по дереву
         /// </summary>
         /// <param name="value"></param>
         /// <param name="updateChildren"></param>
         /// <param name="updateParent"></param>
-        private void SetCheckedDown(bool? value)
+        public virtual void UpdateCheckedThisAndDown(bool? value)
         {
-            if (value == isChecked) return;
-
             SetChecked(value);
-
-            if (IsDirectory) UnequalChildren.ForEach(c => c.SetCheckedDown(value));
-        }
-
-        /// <summary>
-        /// Проверка корректности статуса выбора
-        /// </summary>
-        private void VerifyCheckState()
-        {
-            bool? value = CalcCheckState();
-            SetChecked(value);
-
-            if (Twin != null)
-            {
-                bool? twinValue = Twin.CalcCheckState();
-                Twin.SetChecked(twinValue);
-            }
-
-            if (Parent != null) Parent.VerifyCheckState();
-        }
-
-        /// <summary>
-        /// Вычисление статуса выбора по дочерним объектам
-        /// </summary>
-        private bool? CalcCheckState()
-        {
-            bool? value = false;
-            for (int i = 0; i < UnequalChildren.Count; i++)
-            {
-                bool? current = UnequalChildren[i].isChecked;
-                if (i == 0) value = current;
-                else if (value != current)
-                {
-                    value = null;
-                    break;
-                }
-            }
-
-            return value;
         }
 
         #endregion
@@ -291,74 +233,17 @@ namespace Synchronizer2.Model
             set
             {
                 SetIsExpanded(value); 
-                if (Twin != null) Twin.SetIsExpanded(value);
+                Twin?.SetIsExpanded(value);
             }
         }
 
         /// <summary>
         /// Задание флага раскрытия списка вложенных элементов
         /// </summary>
-        private void SetIsExpanded(Boolean value)
+        protected void SetIsExpanded(Boolean value)
         {
             isExpanded = value;
             OnPropertyChanged("IsExpanded");
-        }
-
-        /// <summary>
-        /// Задание флага раскрытия списка всех вложенных элементов
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetIsExpandedAll(Boolean value, Boolean isAnalyzed)
-        {
-            if (!value) SetIsCollapsedAll();
-            else
-            {
-                Int32 quota = 1000;
-                Int32 level = 0;
-                while (quota > 0)
-                {
-                    Int32 newQuota = SetIsExpandedAllWave(level, quota, isAnalyzed);
-                    if (newQuota == quota) break;
-
-                    quota = newQuota;
-                    level++;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Раскрытие элементов волнами (иначе вешает систему)
-        /// </summary>
-        /// <param name="value"></param>
-        private Int32 SetIsExpandedAllWave(Int32 level, Int32 quota, Boolean isAnalyzed)
-        {
-            if (level == 0)
-            {
-                SetIsExpanded(true);
-                if (isAnalyzed) quota -= UnequalChildren.Count;
-                else quota -= Children.Count;
-            }
-            else
-            {
-                foreach (FSItem item in Children)
-                {
-                    if (item.IsDirectory && quota > 0) quota = item.SetIsExpandedAllWave(level - 1, quota, isAnalyzed);
-                }
-            }
-            
-            return quota;
-        }
-
-        /// <summary>
-        /// Сокрытие всех элементов
-        /// </summary>
-        private void SetIsCollapsedAll()
-        {
-            SetIsExpanded(false);
-            foreach (FSItem item in Children)
-            {
-                if (item.IsDirectory) item.SetIsCollapsedAll();
-            }
         }
 
         /// <summary>
