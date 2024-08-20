@@ -21,6 +21,8 @@ namespace Synchronizer2.Processing
 
                 RecursiveTreeBuild(Tree.Root, 100);
 
+                Tree.Root.RebuildUnequalChildren();
+
                 if (forceStop)
                 {
                     Logger.RaiseError("Build stoped - " + directoryPath.FullName);

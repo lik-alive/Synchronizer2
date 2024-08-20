@@ -117,7 +117,9 @@ namespace Synchronizer2.Model
         {
             UnequalChildren = new List<FSItem>();
 
-            Children.FindAll(c => !c.IsEqual).ForEach(c => UnequalChildren.Add(c));
+            List<FSItem> unequal = Children.FindAll(c => !c.IsEqual);
+            unequal.Sort((c1, c2) => c1.LowerName.CompareTo(c2.LowerName));
+            unequal.ForEach(c => UnequalChildren.Add(c));
 
             Children.FindAll(c => c.IsDirectory).ForEach(c => (c as FSDirectory).RebuildUnequalChildren());
         }

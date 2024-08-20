@@ -168,8 +168,28 @@ namespace Synchronizer2.Model
                 Twin?.UpdateCheckedThisAndDown(value);
 
                 // Проверка корректности статуса выбора вверх по дереву
-                Parent?.VerifyCheckUp();
-                Twin?.Parent?.VerifyCheckUp();
+                Parent.VerifyCheckUp();
+                if (Twin != null)
+                {
+                    Twin?.Parent.VerifyCheckUp();
+                }
+                else
+                {
+                    FSDirectory cur = Parent;
+                    // Ищем ближайшую родительскую папку, имеющую двойника
+                    while (cur != null && cur.Twin == null)
+                    {
+                        cur = cur.Parent;
+                    }
+
+                    // Статус выбора противоположен: в одной папке нет файлов для синхронизации, а у её двойника есть уникальный файл
+                    if (cur != null && cur.Twin.IsChecked == !value && cur.Twin.UnequalChildren.Count == 0)
+                    {
+                        cur.Twin.SetChecked(value);
+                        cur.Twin.Parent.VerifyCheckUp();
+                    }
+                }
+                
             }
         }
 

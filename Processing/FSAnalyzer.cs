@@ -21,9 +21,13 @@ namespace Synchronizer2.Processing
                 // Analysis
                 RecursiveAnalysis(tree1.Root, tree2.Root);
 
+                // Rebuild unequal children
+                tree1.Root.RebuildUnequalChildren();
+                tree2.Root.RebuildUnequalChildren();
+
                 // Set check statuses (DO NOT REFACTOR THIS, NAIVE ONE - YOU WON'T COVER ALL CASES!)
-                SetCheckStatuses(tree1.Root);
-                SetCheckStatuses(tree2.Root);
+                MarkUnique(tree1.Root);
+                MarkUnique(tree2.Root);
 
                 if (forceStop)
                 {
@@ -148,14 +152,15 @@ namespace Synchronizer2.Processing
         }
 
         /// <summary>
-        /// Установка статуса выбора только для файлов, требующих синхронизации
+        /// Установка статуса выбора для уникальных файлов
         /// </summary>
         /// <param name="root"></param>
-        private void SetCheckStatuses(FSDirectory root)
+        private void MarkUnique(FSDirectory root)
         {
-            // В процессе анализа все дочерние файлы отмечены для синхронизации (как следствие, отмечена и родительская папка)
+            // Если родительская папка отмечена, значит, все файлы были отмечены в процессе сравнения и, следовательно, уникальных тут нет
             if (root.IsChecked == true) return;
 
+            // Уникальные файлы
             if (root.UnequalChildren.Count > 0)
             {
                 foreach (FSItem item in root.UnequalChildren)
@@ -164,7 +169,7 @@ namespace Synchronizer2.Processing
 
                     if (item.IsDirectory)
                     {
-                        SetCheckStatuses(item as FSDirectory);
+                        MarkUnique(item as FSDirectory);
                     }
                     else
                     {
@@ -172,8 +177,10 @@ namespace Synchronizer2.Processing
                     }
                 }
             }
+            // Уникальные папки
             else
             {
+                // Не следует выбирать корневую, так как тогда выберутся вообще все
                 if (root.IsUnique && root.Parent != null) root.IsChecked = true;
             }
         }
