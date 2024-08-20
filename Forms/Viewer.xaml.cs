@@ -70,6 +70,7 @@ namespace Synchronizer2.Forms
         /// </summary>
         public void Redraw()
         {
+            Tree.Root.RebuildUnequalChildren();
             treeZone.Redraw(Tree);
         }
 
@@ -149,6 +150,7 @@ namespace Synchronizer2.Forms
             if (Twin.Tree.Root != null && Twin.Tree.IsAnalyzed)
             {
                 Twin.Tree.IsAnalyzed = false;
+                // Clear current flags (unique, old, large...)
                 Twin.Tree.Root.Clear();
                 Twin.Redraw();
             }

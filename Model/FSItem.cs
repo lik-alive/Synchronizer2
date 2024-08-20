@@ -60,10 +60,7 @@ namespace Synchronizer2.Model
         /// <summary>
         /// Заглушка для корректного отображения дерева объектов
         /// </summary>
-        public virtual List<FSItem> UnequalChildren
-        {
-            get;
-        }
+        public virtual List<FSItem> UnequalChildren { get; protected set; } = null;
 
         #endregion
 

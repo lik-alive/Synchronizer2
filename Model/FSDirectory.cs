@@ -27,21 +27,7 @@ namespace Synchronizer2.Model
         /// <summary>
         /// Различающиеся дочерние объекты (папки + файлы)
         /// </summary>
-        public override List<FSItem> UnequalChildren
-        {
-            get
-            {
-                List<FSItem> res = new List<FSItem>();
-                foreach (FSItem item in Children)
-                {
-                    if (!item.IsEqual)
-                    {
-                        res.Add(item);
-                    }
-                }
-                return res;
-            }
-        }
+        public override List<FSItem> UnequalChildren { get; protected set; } = null;
 
         #endregion // Properties
 
@@ -122,6 +108,18 @@ namespace Synchronizer2.Model
             }
 
             return value;
+        }
+
+        /// <summary>
+        /// Перестроить список отличающихся вложенных объектов
+        /// </summary>
+        public void RebuildUnequalChildren()
+        {
+            UnequalChildren = new List<FSItem>();
+
+            Children.FindAll(c => !c.IsEqual).ForEach(c => UnequalChildren.Add(c));
+
+            Children.FindAll(c => c.IsDirectory).ForEach(c => (c as FSDirectory).RebuildUnequalChildren());
         }
 
         #endregion

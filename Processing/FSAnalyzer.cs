@@ -15,10 +15,6 @@ namespace Synchronizer2.Processing
                 DateTime start = DateTime.Now;
                 Logger.RaiseLog("Analysis in progress...");
 
-                // Clear all flags
-                tree1.Root.Clear();
-                tree2.Root.Clear();
-
                 // Calc root1 items count
                 progressInc = 100.0 / RecursiveCalcCount(tree1.Root);
 
