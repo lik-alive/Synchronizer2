@@ -59,7 +59,9 @@
                                     <RowDefinition Height="40" />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <Label Grid.Row="0" Content="{Binding ShortPath}" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Padding="0"/>
+                                <Label Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Padding="0">
+                                    <TextBlock Text="{Binding ShortPath}"/>
+                                </Label>
                                 <TextBlock MaxHeight="50" Grid.Row="1" Text="{Binding Path}" TextWrapping="Wrap" FontSize="12" Foreground="#555" VerticalAlignment="Top" />
                             </Grid>
                         </Button>
