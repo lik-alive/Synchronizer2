@@ -9,7 +9,7 @@
         xmlns:styles="clr-namespace:Synchronizer2.Styles"
         Style="{DynamicResource WindowStyle}"
         mc:Ignorable="d"
-        Title="Synchronizer v2" FontSize="16" BorderBrush="#31C3FD" WindowStyle="None" WindowStartupLocation="CenterScreen" MinWidth="850" MinHeight="400" d:DesignWidth="934" Icon="/Synchronizer2;component/Resources/live_sync.ico" Background="#EFEFEF" Closed="mainWindow_Closed">
+        Title="Synchronizer v2" FontSize="16" BorderBrush="#31C3FD" WindowStyle="None" WindowStartupLocation="CenterScreen" MinWidth="850" MinHeight="400" Width="1200" Height="700" d:DesignWidth="934" Icon="/Synchronizer2;component/Resources/live_sync.ico" Background="#EFEFEF" Closed="mainWindow_Closed">
     <Window.Resources>
         <Style x:Key="mdi_CompareStyle" TargetType="Path">
             <Setter Property="Fill" Value="Black"/>
