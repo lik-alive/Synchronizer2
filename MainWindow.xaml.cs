@@ -122,7 +122,7 @@ namespace Synchronizer2
                         right.Redraw();
 
                         //Проверка отсутствия файлов на синхронизацию
-                        if (left.Tree.Root.IsChecked == false && right.Tree.Root.IsChecked == false)
+                        if (left.Tree.Root.IsEqual == true)
                         {
                             new InfoOK("Folders are equal").ShowDialog();
                             return;

@@ -146,9 +146,9 @@ namespace Synchronizer2.Processing
                 Boolean isSmaller2 = file2.Length < file1.Length;
 
                 file2.SetAllFlags(false, isNewer2, isOlder2, isBigger2, isSmaller2);
-
-                file1.IsChecked = true;
             }
+
+            item1.IsChecked = true;
         }
 
         /// <summary>
