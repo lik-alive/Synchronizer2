@@ -164,9 +164,9 @@ namespace Synchronizer2
             }
 
             //Проверка отсутствия файлов на синхронизацию
-            if (left.Tree.Root.IsChecked == false && right.Tree.Root.IsChecked == false)
+            if (tree1.Root.IsEqual || (tree1.Root.IsChecked == false && tree2.Root.IsChecked == false))
             {
-                new InfoOK("Folders are equal").ShowDialog();
+                new InfoOK("Nothing to synchronize").ShowDialog();
                 return;
             }
 
@@ -219,7 +219,7 @@ namespace Synchronizer2
         /// <returns></returns>
         private Boolean HasFileForDeletion(FSDirectory root)
         {
-            foreach (FSItem item in root.Children)
+            foreach (FSItem item in root.UnequalChildren)
             {
                 if (item.IsChecked == true && item.IsUnique) return true;
 

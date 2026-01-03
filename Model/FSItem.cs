@@ -153,7 +153,7 @@ namespace Synchronizer2.Model
         /// <summary>
         /// Флаг выбора объекта для синхронизации
         /// </summary>
-        private Boolean? isChecked = false;
+        private Boolean? isChecked = true;
 
         /// <summary>
         /// Статус выбора объекта для синхронизации
@@ -168,7 +168,7 @@ namespace Synchronizer2.Model
                 Twin?.UpdateCheckedThisAndDown(value);
 
                 // Проверка корректности статуса выбора вверх по дереву
-                Parent.VerifyCheckUp();
+                Parent?.VerifyCheckUp();
                 if (Twin != null)
                 {
                     Twin?.Parent.VerifyCheckUp();

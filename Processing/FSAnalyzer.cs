@@ -25,9 +25,9 @@ namespace Synchronizer2.Processing
                 tree1.Root.RebuildUnequalChildren();
                 tree2.Root.RebuildUnequalChildren();
 
-                // Set check statuses (DO NOT REFACTOR THIS, NAIVE ONE - YOU WON'T COVER ALL CASES!)
-                MarkUnique(tree1.Root);
-                MarkUnique(tree2.Root);
+                // Clear root check status if it hasn't unequal children
+                if (tree1.Root.UnequalChildren.Count == 0) tree1.Root.IsChecked = false;
+                if (tree2.Root.UnequalChildren.Count == 0) tree2.Root.IsChecked = false;
 
                 if (forceStop)
                 {
@@ -146,42 +146,6 @@ namespace Synchronizer2.Processing
                 Boolean isSmaller2 = file2.Length < file1.Length;
 
                 file2.SetAllFlags(false, isNewer2, isOlder2, isBigger2, isSmaller2);
-            }
-
-            item1.IsChecked = true;
-        }
-
-        /// <summary>
-        /// Установка статуса выбора для уникальных файлов
-        /// </summary>
-        /// <param name="root"></param>
-        private void MarkUnique(FSDirectory root)
-        {
-            // Если родительская папка отмечена, значит, все файлы были отмечены в процессе сравнения и, следовательно, уникальных тут нет
-            if (root.IsChecked == true) return;
-
-            // Уникальные файлы
-            if (root.UnequalChildren.Count > 0)
-            {
-                foreach (FSItem item in root.UnequalChildren)
-                {
-                    if (forceStop) return;
-
-                    if (item.IsDirectory)
-                    {
-                        MarkUnique(item as FSDirectory);
-                    }
-                    else
-                    {
-                        if (item.IsUnique) item.IsChecked = true;
-                    }
-                }
-            }
-            // Уникальные папки
-            else
-            {
-                // Не следует выбирать корневую, так как тогда выберутся вообще все
-                if (root.IsUnique && root.Parent != null) root.IsChecked = true;
             }
         }
     }
